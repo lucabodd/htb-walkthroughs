@@ -5,8 +5,10 @@ HTB walkthroughs for both active and retired machines
 we should create a .md file for each machine.
 each file must be titled with the name of the machine.
 each file must contain two paragraphs:
+
 * user: marked with ##
 * root: marked with ##
+
 screenshots or any kind of additional documentation that ease the understanding of the processes/tools/technologies used are welcome and strongly reccomended.
 
 ## Luv the "you" of the future
