@@ -2,8 +2,13 @@
 ```
 Difficulty: 
 Operating System: 
-Hints: True
+Hints: 
 ```
+## Initial Enumeration
+Running nmap scan (TCP) on the target shows the following
+```
+```
+
 ## User
 
 ## Root
