@@ -75,7 +75,7 @@ bank.htb.               604800  IN      SOA     bank.htb. chris.bank.htb. 5 6048
 ```
 Here we can see that we discovered few subdomains, so just add them to the /etc/hosts file and hit the webserver.
 ## User
-### Method 1 - Unintended
+### Method 1 - Vulnerable 302 Redirection (Unintended)
 Poking around with burp we can see that when hitting /index.php we receive a 302 from the server, but below we can see some code which is odd.
 ```
 HTTP/1.1 302 Found
