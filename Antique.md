@@ -1,4 +1,4 @@
-# Antique
+# Antique 
 ```
 Difficulty: Easy
 Operating System: Linux
