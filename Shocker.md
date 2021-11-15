@@ -1,4 +1,4 @@
-# Antique
+# Shocker
 ```
 Difficulty: Easy
 Operating System: Linux
