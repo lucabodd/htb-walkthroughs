@@ -6,17 +6,17 @@ we should create a .md file for each machine.
 each file must be titled with the name of the machine.
 each file must be structured as following:
 
-```
+````
 # Machine Name
-\```
+```
 Difficulty:
 Operating System:
 Hints:
-\```
+```
 ## Initial Enumeration
 Running nmap scan (TCP) on the target shows the following
-\```
-\```
+```
+```
 
 ## User
 ### Method 1 - Method Title
@@ -24,7 +24,7 @@ Running nmap scan (TCP) on the target shows the following
 ## Root
 ### Method 1 - Method Title
 ### Method 2 - Method Title
-```
+````
 
 screenshots or any kind of additional documentation that ease the understanding of the processes/tools/technologies used are welcome and strongly recommended.  
 For a standard usage please refer to [this file](https://github.com/lucabodd/htb-walkthroughs/blob/main/Template.md)
