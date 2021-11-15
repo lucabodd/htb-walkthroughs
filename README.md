@@ -9,7 +9,8 @@ each file must contain two paragraphs:
 * user: marked with ##
 * root: marked with ##
 
-screenshots or any kind of additional documentation that ease the understanding of the processes/tools/technologies used are welcome and strongly reccomended.
+screenshots or any kind of additional documentation that ease the understanding of the processes/tools/technologies used are welcome and strongly recommended.
+For a standard usage please refer to [this file](https://github.com/lucabodd/htb-walkthroughs/blob/main/Template.md)
 
 ## Luv the "you" of the future
 If a tool used for exploiting a machine is tricky, difficult or for any reason it's use is not straight forward, please document it's usage [here](https://github.com/lucabodd/Pentesting-notes/tree/master)

@@ -1,4 +1,4 @@
-# Antique
+# Machine Name
 ```
 Difficulty:
 Operating System:
