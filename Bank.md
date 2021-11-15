@@ -1,4 +1,4 @@
-# Antique
+# Bank
 ```
 Difficulty: Easy
 Operating System: Linux
