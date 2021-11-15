@@ -1,4 +1,4 @@
-# Antique
+# Blocky
 ```
 Difficulty: Easy
 Operating System: Linux
