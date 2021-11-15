@@ -24,7 +24,7 @@ PORT     STATE  SERVICE VERSION
 8192/tcp closed sophos
 Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
 ```
-Given the initial scan, let's dig deeper into port 80.
+Given the initial scan, let's dig deeper into port 80.  
 let's enumerate directories and see if we discover something intresting.
 ```
 /wiki                 (Status: 301) [Size: 309] [--> http://10.10.10.37/wiki/]
@@ -36,9 +36,9 @@ let's enumerate directories and see if we discover something intresting.
 /phpmyadmin           (Status: 301) [Size: 315] [--> http://10.10.10.37/phpmyadmin/]
 /server-status        (Status: 403) [Size: 299]
 ```
-Now, here's a rabbit hole that we can easilly jump straight in.
-As we can see there is a wordpress installed on this server, we can try to exploit wordpress but there are tons of exploit available to try. there is a much easyer way.
-Before jump into the rabbit hole, as a practice, make sure to enumerate everything.
+Now, here's a rabbit hole that we can easilly jump straight in.  
+As we can see there is a wordpress installed on this server, we can try to exploit wordpress but there are tons of exploit available to try. there is a much easier way.  
+Before jump into the rabbit hole, as a practice, make sure to enumerate everything.  
 Anyway enumerating wordpress show a user "notch".
 ```
 [i] User(s) Identified:
@@ -55,7 +55,7 @@ Anyway enumerating wordpress show a user "notch".
  | Found By: Rss Generator (Passive Detection)
  | Confirmed By: Login Error Messages (Aggressive Detection)
 ```
-we can check if this user is also available for ssh login.
+we can check if this user is also available for ssh login.  
 To check this we can use the metasploit module ```scanner/ssh/ssh_enumusers``` and set the options as follows
 ```
 msf6 auxiliary(scanner/ssh/ssh_enumusers) > set RHOSTS 10.10.10.37
@@ -69,10 +69,10 @@ msf6 auxiliary(scanner/ssh/ssh_enumusers) > run
 [*] Scanned 1 of 1 hosts (100% complete)
 [*] Auxiliary module execution completed
 ```
-Now, let's go now to the /plugins directory.
-Here we can find two .jar files hosted: "BlockyCore.jar" and "griefprevention-1.11.2-3.1.1.298.jar".
-.jar file are nothing else but archives, to extract this archive we can use zip command.
-when we extract archives we can se .class file.
+Now, let's go now to the /plugins directory.  
+Here we can find two .jar files hosted: "BlockyCore.jar" and "griefprevention-1.11.2-3.1.1.298.jar".  
+.jar file are nothing else but archives, to extract this archive we can use zip command.  
+when we extract archives we can se .class file.  
 To decompile class files we can use ```jad``` (or ```jd-gui``` with the UI) and here we get the .jad file with the code in a readable format
 ## User
 ### Method 1 - Class File Decompile and Password Reuse
@@ -107,7 +107,7 @@ Now we got user.
 
 ### Method 2 - Wordpress Theme Exploitation and Password Seek in Configuration Files
 Let's suppose now that, for some reason this credential does not work with the ssh service and we can somehow exploit the ftp service.  
-Now we can try to login to ftp, create a .ssh/ directory and upload our public key into .ssh/authorized_keys and login using our certificate.  
+Now we can try to login to ftp, create a .ssh/ directory and upload our public key into .ssh/authorized_keys and login using our certificate.   
 In order to do this we can establish the followig ftp session:
 ```
 [root@kali Blocky ]$ ftp $TARGET

