@@ -1,4 +1,4 @@
-# Antique
+# Beep
 ```
 Difficulty: Easy
 Operating System: Linux
