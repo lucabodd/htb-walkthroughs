@@ -138,8 +138,40 @@ Notable for its extreme minimalism, the language consists of only eight simple c
 While it is fully Turing complete, it is not intended for practical use, but to challenge and amuse programmers. Brainfuck simply requires one to break commands into microscopic steps.  
 Now, let's decode:
 ```
-
+idkwhatispass
 ```
+Seems like we got a password and went to the bottom of this challenge. Now, let's try to other directories initially found with gobuster.  
+If we dig into /dev, we can find:
+```
+/test                 (Status: 200) [Size: 5]
+/backup               (Status: 301) [Size: 194] [--> http://10.10.10.111:9999/dev/backup/]
+```
+if we open /dev/backup, we can find a reference to a new path "/playsms"
+
 ## User
+Once we fond the /playsms login page we can login using "admin" and "idkwhatispass".  
+Now we are logged in as admin to playsms.
+Now the obvious thing to do is to enumerate the version and search for publicly available exploits.  
+Since we cannot enumerate the version, we can choose the exploit and go blindfolded.
+```
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                                                                                                                                             |  Path
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
+PlaySms 0.7 - SQL Injection                                                                                                                                                                                | linux/remote/404.pl
+PlaySms 0.8 - 'index.php' Cross-Site Scripting                                                                                                                                                             | php/webapps/26871.txt
+PlaySms 0.9.3 - Multiple Local/Remote File Inclusions                                                                                                                                                      | php/webapps/7687.txt
+PlaySms 0.9.5.2 - Remote File Inclusion                                                                                                                                                                    | php/webapps/17792.txt
+PlaySms 0.9.9.2 - Cross-Site Request Forgery                                                                                                                                                               | php/webapps/30177.txt
+PlaySMS 1.4.3 - Template Injection / Remote Code Execution                                                                                                                                                 | php/webapps/48199.txt
+PlaySMS 1.4 - 'import.php' Remote Code Execution                                                                                                                                                           | php/webapps/42044.txt
+PlaySMS 1.4 - Remote Code Execution                                                                                                                                                                        | php/webapps/42038.txt
+PlaySMS 1.4 - 'sendfromfile.php?Filename' (Authenticated) 'Code Execution (Metasploit)                                                                                                                     | php/remote/44599.rb
+PlaySMS 1.4 - '/sendfromfile.php' Remote Code Execution / Unrestricted File Upload                                                                                                                         | php/webapps/42003.txt
+PlaySMS - 'import.php' (Authenticated) CSV File Upload Code Execution (Metasploit)                                                                                                                         | php/remote/44598.rb
+PlaySMS - index.php Unauthenticated Template Injection Code Execution (Metasploit)                                                                                                                         | php/remote/48335.rb
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
+Shellcodes: No Results
+```
+Now
 
 ## Root
