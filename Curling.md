@@ -224,7 +224,14 @@ and in 'report' file we can see the following:
 * * * * * curl -K /home/floris/admin-area/input -o /home/floris/admin-area/report
 * * * * * sleep 1; cat /root/default.txt > /home/floris/admin-area/input
 ```
-Obviously now we can cat /root/root.txt file, but we don't want that, we want the shell!  
+Instead of guessing or using this kind of privileged LFI, we can run [pspy64](https://github.com/DominicBreuker/pspy) with user floris and see that we can get the same information about cron:
+```
+2021/12/15 22:32:01 CMD: UID=0    PID=4495   | /bin/sh -c sleep 1; cat /root/default.txt > /home/floris/admin-area/input
+2021/12/15 22:32:01 CMD: UID=0    PID=4494   | /usr/sbin/CRON -f
+2021/12/15 22:32:01 CMD: UID=0    PID=4493   | /usr/sbin/CRON -f
+2021/12/15 22:32:01 CMD: UID=0    PID=4498   | curl -K /home/floris/admin-area/input -o /home/floris/admin-area/report
+```
+Now, Obviously now we can cat /root/root.txt file, but we don't want that, we want the shell!  
 To achieve this, we can inspect curl manual for -K
 ```
 -K, --config <file>
