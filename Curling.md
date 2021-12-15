@@ -224,7 +224,7 @@ and in 'report' file we can see the following:
 * * * * * curl -K /home/floris/admin-area/input -o /home/floris/admin-area/report
 * * * * * sleep 1; cat /root/default.txt > /home/floris/admin-area/input
 ```
-Instead of guessing or using this kind of privileged LFI, we can run [pspy64](https://github.com/DominicBreuker/pspy) with user floris and see that we can get the same information about cron:
+Instead of guessing or using this kind of privileged LFI, we can run [pspy64](https://github.com/DominicBreuker/pspy) with user floris and see that we can get the same information retrived above:
 ```
 2021/12/15 22:32:01 CMD: UID=0    PID=4495   | /bin/sh -c sleep 1; cat /root/default.txt > /home/floris/admin-area/input
 2021/12/15 22:32:01 CMD: UID=0    PID=4494   | /usr/sbin/CRON -f
