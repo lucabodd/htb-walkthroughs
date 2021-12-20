@@ -58,10 +58,10 @@ So without further doing let's searchsploit for unreal ircd:
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
  Exploit Title                                                                                                                                                                                             |  Path
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
-[01;31m[KUnrealIRC[m[Kd 3.2.8.1 - Backdoor Command Execution (Metasploit)                                                                                                                                               | linux/remote/16922.rb
-[01;31m[KUnrealIRC[m[Kd 3.2.8.1 - Local Configuration Stack Overflow                                                                                                                                                    | windows/dos/18011.txt
-[01;31m[KUnrealIRC[m[Kd 3.2.8.1 - Remote Downloader/Execute                                                                                                                                                             | linux/remote/13853.pl
-[01;31m[KUnrealIRC[m[Kd 3.x - Remote Denial of Service                                                                                                                                                                  | windows/dos/27407.pl
+UnrealIRC 3.2.8.1 - Backdoor Command Execution (Metasploit)                                                                                                                                               | linux/remote/16922.rb
+UnrealIRC 3.2.8.1 - Local Configuration Stack Overflow                                                                                                                                                    | windows/dos/18011.txt
+UnrealIRC 3.2.8.1 - Remote Downloader/Execute                                                                                                                                                             | linux/remote/13853.pl
+UnrealIRC 3.x - Remote Denial of Service                                                                                                                                                                  | windows/dos/27407.pl
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
 Shellcodes: No Results
 ```
