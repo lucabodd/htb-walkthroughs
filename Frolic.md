@@ -1,4 +1,4 @@
-# Machine Name
+# Frolic
 ```
 Difficulty: Easy
 Operating System: Linux
