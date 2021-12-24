@@ -1,4 +1,4 @@
-# Machine Name
+# Irked
 ```
 Difficulty: Easy
 Operating System: Linux
