@@ -1,4 +1,4 @@
-# Machine Name
+# Curling
 ```
 Difficulty: Easy
 Operating System: Linux
