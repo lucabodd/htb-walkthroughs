@@ -1,4 +1,4 @@
-# Machine Name
+# Teacher
 ```
 Difficulty: Easy
 Operating System: Linux
