@@ -332,6 +332,6 @@ tar: Error is not recoverable: exiting now
 So, the script:
 * changes directory to /home/giovanni/work
 * tar a file without success (because tmp is 'Not a directory')
-* cd to tmp tha fails (because tmp is 'Not a directory')
+* cd to tmp that fails (because tmp is 'Not a directory')
 * the tar extraction fails again because the previous archive has not been created, so it gives 'No such file or directory'
 * and then recursively chmod with 777 the current directory which is /home/giovanni/work (containing the symlink to /etc/shadow as well)
