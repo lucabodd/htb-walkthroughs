@@ -1,4 +1,4 @@
-# Machine Name
+# Bashed
 ```
 Difficulty: Easy
 Operating System: Linux
@@ -34,7 +34,7 @@ So, let's try to enumerate port 80 with gobuster and examine the results.
 ```
 If we visit the [Arrexel GitHub Repo](https://github.com/Arrexel/phpbash) (URL disclosed inside the site), we can see that this webshell is called phpbash.php.  
 So, let's go through all this directory and see where phpbash.php is located.  
-as we can easilly discover phpbash is available by hittinh http://10.10.10.68/dev/phpbash.php.  
+as we can easilly discover phpbash is available by hitting http://10.10.10.68/dev/phpbash.php.  
 Now we have accesso to this box as www-data.
 
 ## User
@@ -70,7 +70,7 @@ find: /home/scriptmanager
 /home/scriptmanager/.bash_logout
 ```
 Now, if we switch to /scripts directory we can see a simple script ```test.py``` that write text to ```test.txt```.  
-Now, if we inspect dates/permissions wit a simple ls, we can see the following:
+Now, if we inspect dates/permissions with a simple ls, we can see the following:
 ```
 scriptmanager@bashed:/scripts$ ls -la
 total 16
