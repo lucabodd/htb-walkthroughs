@@ -1,11 +1,11 @@
-# Machine Name
+# LaCasaDePapel
 ```
-Difficulty:
-Operating System:
-Hints:
+Difficulty: Easy
+Operating System: Linux
+Hints: True
 ```
 ## Initial Enumeration
-Running nmap scan (TCP) on the target shows the following results:
+Running nmap scan (TCP) on the target shows the following
 ```
 ```
 ## Foothold (optional)
