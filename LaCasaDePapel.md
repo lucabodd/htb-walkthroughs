@@ -185,6 +185,7 @@ ZwIDAQAB
  ```
  Now that we verified that the public key is the same of the certificate private key, and we do have the leaked certificate private key, we can generate the client key with:
 ```
+[root@kali LaCasaDePapel ]$ openssl genrsa -out client.key 4096
 Generating RSA private key, 4096 bit long modulus (2 primes)
 .........................................................................++++
 ...............................................++++
