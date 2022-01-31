@@ -1,4 +1,4 @@
-# Machine Name
+# SwagShop
 ```
 Difficulty: Easy
 Operating System: Linux
