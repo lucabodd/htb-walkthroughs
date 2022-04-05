@@ -23,7 +23,7 @@ As we can see the webserver is running using 'nostromo' wich is quite uncommon.
 Before looking into exploits, let's poke around the site and see what we can get.  
 s we open the site, we can see a pretty basic template without much customization, and no features, so let's start searching exploits for nostromo.
 
-## Foothold (optional)
+## Foothold 
 If we perform a searchsploit for nostromo, we can see the following:  
 ```
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
