@@ -16,4 +16,4 @@ Running nmap scan (TCP) on the target shows the following results:
 
 ## Root
 Once we log in, following our standard approach, we can run linPEAS looking for possible privilege escalation vectors.    
-After we run linPEAS notice
+After we run linPEAS, we can notice
