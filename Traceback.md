@@ -2,7 +2,7 @@
 ```
 Difficulty: Easy
 Operating System: Linux
-Hints:
+Hints: True
 ```
 ## Initial Enumeration
 Running nmap scan (TCP) on the target shows the following results:
