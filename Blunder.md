@@ -18,11 +18,30 @@ Before starting digging into port 21 let's poke around on port 80.
 As we hit the site homepage, we can see a site containing various articles and no much else.  
 so let's start directory enumeration and see what we can find:  
 ```
-
+/about                (Status: 200) [Size: 3281]
+/0                    (Status: 200) [Size: 7562]
+/admin                (Status: 301) [Size: 0] [--> http://10.10.10.191/admin/]
+/usb                  (Status: 200) [Size: 3960]
+/LICENSE              (Status: 200) [Size: 1083]
+/%3FRID%3D2671        (Status: 200) [Size: 7562]
+/server-status        (Status: 403) [Size: 277]
+/%3F%3F               (Status: 200) [Size: 7562]
+/%3F%3F%3F%3F%3F%3F%3F%3F%3F%3F%3F%3F%3F (Status: 200) [Size: 7562]
+/%3Fmethod%3Declou3   (Status: 200) [Size: 7562]
+/%3Fmethod%3Dbanner   (Status: 200) [Size: 7562]
+/%3f                  (Status: 200) [Size: 7562]
 ```
 Let's start enumerating files also:
 ```
-
+/admin                (Status: 301) [Size: 0] [--> http://10.10.10.191/admin/]
+/install.php          (Status: 200) [Size: 30]
+/LICENSE              (Status: 200) [Size: 1083]
+/about                (Status: 200) [Size: 3281]
+/0                    (Status: 200) [Size: 7562]
+/robots.txt           (Status: 200) [Size: 22]
+/todo.txt             (Status: 200) [Size: 118]
+/usb                  (Status: 200) [Size: 3960]
+/.gitignore           (Status: 200) [Size: 563]
 ```
 We can see the file todo.txt which contains:  
 ```
