@@ -51,8 +51,9 @@ Sec-GPC: 1
 
 uid=b0d&password=Password&confirm=Password&roleid=1
 ```
-After we register the account we can login with the given credentials to admin.php, here we can find the below information:  
-![[Pasted image 20220518103850.png]]
+After we register the account we can login with the given credentials to admin.php, here we can find the below: 
+![](Pasted%20image%2020220518104752.png)
+
 ## Foothold (optional)
 
 ## User
