@@ -1,0 +1,95 @@
+{
+  "main": {
+    "id": "dbefcc4ba6003b9a",
+    "type": "split",
+    "children": [
+      {
+        "id": "f1443f03e29af2b7",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "Academy.md",
+            "mode": "source",
+            "source": false
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "f5c087ccac7e5c61",
+    "type": "split",
+    "children": [
+      {
+        "id": "6691755356bce16f",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "abfd356b2b12a8da",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "87ff7e1aca8c0757",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 210
+  },
+  "right": {
+    "id": "60c20b51aa0c3961",
+    "type": "split",
+    "children": [
+      {
+        "id": "4f65f2d752cf80e8",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a4ff3df6335eae6e",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Academy.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "f1443f03e29af2b7",
+  "lastOpenFiles": [
+    "Academy.md",
+    "NefFileFormat.md"
+  ]
+}
