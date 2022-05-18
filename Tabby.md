@@ -153,7 +153,7 @@ OS: Linux version 5.4.0-31-generic (buildd@lgw01-amd64-059) (gcc version 9.3.0 (
 User & Groups: uid=1000(ash) gid=1000(ash) groups=1000(ash),4(adm),24(cdrom),30(dip),46(plugdev),116(lxd)
 Hostname: tabby
 ```
-As we did for [shocker](https://github.com/lucabodd/htb-walkthroughs/blob/main/Shocker.md) we know that we can leverage this group to create a linux container and mount the rootfs. Ounce the machine is booted and the rootfs is mounted we will be able to write any file on the box and even drop an ssh key for root.  
+As we did for [shocker](Shocker.md) we know that we can leverage this group to create a linux container and mount the rootfs. Ounce the machine is booted and the rootfs is mounted we will be able to write any file on the box and even drop an ssh key for root.  
 LXD is Ubuntu’s system container manager. This is similar to virtual machines, but using lightweight linux containers.  
 The lxd group should be considered harmful in the same way the docker group is.  
 Any member of the lxd group can immediately escalate their privileges to root on the host operating system.
@@ -167,7 +167,7 @@ After we run this command we can transfer the ```alpine-v3.15-x86_64-20220422_10
 ```
 lxc image import ./alpine-v3.15-x86_64-20220422_1026.tar.gz --alias alpine
 ```
-We do not get any ```error: mkdir /.config: permission denied``` as did happened for [shocker](https://github.com/lucabodd/htb-walkthroughs/blob/main/Shocker.md), hence we can proceed with the exploit.  
+We do not get any ```error: mkdir /.config: permission denied``` as did happened for [shocker](Shocker.md), hence we can proceed with the exploit.  
 ```
 lxc image import ./alpine-v3.15-x86_64-20220422_1026.tar.gz --alias alpine
 lxc image list # verify that the image is loaded
