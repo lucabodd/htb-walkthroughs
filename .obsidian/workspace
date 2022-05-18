@@ -7,12 +7,8 @@
         "id": "f1443f03e29af2b7",
         "type": "leaf",
         "state": {
-          "type": "markdown",
-          "state": {
-            "file": "Academy.md",
-            "mode": "source",
-            "source": false
-          }
+          "type": "graph",
+          "state": {}
         }
       }
     ],
@@ -69,7 +65,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Academy.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -90,6 +85,7 @@
   "active": "f1443f03e29af2b7",
   "lastOpenFiles": [
     "Academy.md",
+    "Antique.md",
     "Pasted image 20220518104349.png.md",
     "Pasted image 20220518104349.png",
     "OpenAdmin.md",
