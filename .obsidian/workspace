@@ -9,7 +9,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Laboratory.md",
+            "file": "Luanne.md",
             "mode": "source",
             "source": false
           }
@@ -53,7 +53,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 210
+    "width": 210,
+    "collapsed": true
   },
   "right": {
     "id": "60c20b51aa0c3961",
@@ -69,7 +70,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Laboratory.md",
+                "file": "Luanne.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -89,6 +90,7 @@
   },
   "active": "f1443f03e29af2b7",
   "lastOpenFiles": [
+    "Luanne.md",
     "Laboratory.md",
     "Academy.md",
     "Antique.md",

@@ -3,5 +3,8 @@
   "livePreview": true,
   "useMarkdownLinks": true,
   "promptDelete": false,
-  "attachmentFolderPath": "Attachments"
+  "attachmentFolderPath": "Attachments",
+  "rightToLeft": false,
+  "autoPairBrackets": false,
+  "readableLineLength": false
 }
