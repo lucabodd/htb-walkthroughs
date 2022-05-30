@@ -9,7 +9,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Luanne.md",
+            "file": "Delivery.md",
             "mode": "source",
             "source": false
           }
@@ -53,8 +53,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 210,
-    "collapsed": true
+    "width": 210
   },
   "right": {
     "id": "60c20b51aa0c3961",
@@ -70,7 +69,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Luanne.md",
+                "file": "Delivery.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -90,6 +89,8 @@
   },
   "active": "f1443f03e29af2b7",
   "lastOpenFiles": [
+    "Delivery.md",
+    "Template.md",
     "Luanne.md",
     "Laboratory.md",
     "Academy.md",
@@ -97,7 +98,6 @@
     "Pasted image 20220518104349.png.md",
     "Pasted image 20220518104349.png",
     "OpenAdmin.md",
-    "Pasted image 20220518103850.png",
-    "NefFileFormat.md"
+    "Pasted image 20220518103850.png"
   ]
 }
