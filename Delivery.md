@@ -138,7 +138,7 @@ Password:
 root@Delivery:~#   
 ```
 
-### Method 1 - MySQL Hash Dump
+### Method 2 - MySQL Hash Dump
 Once we log in, as always we can llok around for possible configuration files that disclose credentials.  
 We can start by looking into mattermost:  
 ```bash
