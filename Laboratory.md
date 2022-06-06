@@ -1,4 +1,4 @@
-# Machine Name
+# Laboratory
 ```
 Difficulty: Easy
 Operating System: Linux
