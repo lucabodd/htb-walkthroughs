@@ -1,7 +1,7 @@
 # Luanne
 ```
 Difficulty: Easy
-Operating System: Linux
+Operating System: NetBSD
 Hints: True
 ```
 ## Initial Enumeration
