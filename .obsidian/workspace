@@ -9,7 +9,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Spectra.md",
+            "file": "BountyHunter.md",
             "mode": "source",
             "source": false
           }
@@ -69,7 +69,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Spectra.md",
+                "file": "BountyHunter.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -89,15 +89,15 @@
   },
   "active": "f1443f03e29af2b7",
   "lastOpenFiles": [
+    "BountyHunter.md",
+    "Template.md",
     "Spectra.md",
     "Luanne.md",
-    "Template.md",
     "ScriptKiddie.md",
     "Traceback.md",
     "Writeup.md",
     "Valentine.md",
     "Traverxec.md",
-    "Teacher.md",
-    "Tabby.md"
+    "Teacher.md"
   ]
 }
