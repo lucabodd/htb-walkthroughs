@@ -69,7 +69,7 @@ XxeLeak().cmdloop()
 
 ```
 As we can see, to include all files (even php files) we can use php filter function to include the file and echo it back as a base64 encoded string.  
-We used the same file exfiltration tecnique also for [FriendZone](Friendzone.md) and [Tabby](Tabby.md).
+We used the same file exfiltration tecnique also for [FriendZone](FriendZone.md) and [Tabby](Tabby.md).
 Now, once the exploit is working, let's start by enumerating the application files:  
 ```bash
 /js                   (Status: 301) [Size: 309] [--> http://10.10.11.100/js/]
