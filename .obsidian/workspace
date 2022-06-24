@@ -9,7 +9,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "BountyHunter.md",
+            "file": "Armageddon.md",
             "mode": "source",
             "source": false
           }
@@ -69,7 +69,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "BountyHunter.md",
+                "file": "Armageddon.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -89,15 +89,15 @@
   },
   "active": "f1443f03e29af2b7",
   "lastOpenFiles": [
+    "Armageddon.md",
+    "Template.md",
     "BountyHunter.md",
     "FriendZone.md",
-    "Template.md",
     "Spectra.md",
     "Luanne.md",
     "ScriptKiddie.md",
     "Traceback.md",
     "Writeup.md",
-    "Valentine.md",
-    "Traverxec.md"
+    "Valentine.md"
   ]
 }
