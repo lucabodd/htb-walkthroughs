@@ -27,7 +27,7 @@ PORT   STATE SERVICE VERSION
 ```
 As we can see we have only two ports open: 22 and 80, so withouth further doing let's start enumerate port 80.  
 As we open the web page, we can notice an authentication prompt, if we try common default credentials we have no luck.  
-If we use `gobuster` and start directory enumeration, we can notice that the sizes of 302 resposes are a bit strange:  
+If we use `gobuster` and start directory enumeration, we can notice that the sizes of 302 responses are a bit strange:  
 ```bash
 ===============================================================
 Gobuster v3.1.0
@@ -61,7 +61,7 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
 /status.php           (Status: 302) [Size: 2966] [--> login.php]              
 Progress: 213832 / 478404 (44.70%)                        
 ```
-if we take one of this resquests and send it to burp, we can see that in the 302 response body the site is discoling the code page before redirecting us.  
+if we take one of this requests and send it to burp, we can see that in the 302 response body the site is disclosing the code page before redirecting us.  
 This type of vulnerability is called Execute After Read (EAR), the same has been discovered in a previous assessment in [Bank](Bank.md).  
 Now we can set up a 'Match and Replace' rule in burpsuite to match `302 Found` and replace it with `200 Ok`  in the response header. 
 Once we setup this rule we will be able to open restricted pages and create an administrator account that we can use to access the platform as a regular user.

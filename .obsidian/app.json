@@ -6,5 +6,12 @@
   "attachmentFolderPath": "Attachments",
   "rightToLeft": false,
   "autoPairBrackets": false,
-  "readableLineLength": false
+  "readableLineLength": false,
+  "spellcheck": true,
+  "spellcheckDictionary": [
+    "nmap",
+    "db",
+    "gobuster",
+    "vhosts"
+  ]
 }

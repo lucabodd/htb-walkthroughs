@@ -18,9 +18,9 @@ PORT   STATE SERVICE VERSION
 |_http-title: Did not follow redirect to http://academy.htb/
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 ```
-As we can se we have only port 22 and 80 opened, so without further doing let's dig into port 80.  
-Before openinig port 80 we can see in nmap that the site is performing a redirection to ```Did not follow redirect to http://academy.htb/``` so let's set up this host in our /etc/hosts file and let's start enumerating webserver.  
-First thing, hitting the website, we can see an 'acedemy' page. The page shows an image and nothing more, so, let's start enumerating the webserver looking for files and directories:  
+As we can see we have only port 22 and 80 opened, so without further doing let's dig into port 80.  
+Before opening port 80 we can see in nmap that the site is performing a redirection to ```Did not follow redirect to http://academy.htb/``` so let's set up this host in our /etc/hosts file and let's start enumerating web-server.  
+First thing, hitting the website, we can see an 'academy' page. The page shows an image and nothing more, so, let's start enumerating the web-server looking for files and directories:  
 ```
 /images               (Status: 301) [Size: 311] [--> http://academy.htb/images/]
 /home.php             (Status: 302) [Size: 55034] [--> login.php]

@@ -335,3 +335,4 @@ So, the script:
 * cd to tmp that fails (because tmp is 'Not a directory')
 * the tar extraction fails again because the previous archive has not been created, so it gives 'No such file or directory'
 * and then recursively chmod with 777 the current directory which is /home/giovanni/work (containing the symlink to /etc/shadow as well)
+
