@@ -7,12 +7,8 @@
         "id": "f1443f03e29af2b7",
         "type": "leaf",
         "state": {
-          "type": "markdown",
-          "state": {
-            "file": "Trick.md",
-            "mode": "source",
-            "source": false
-          }
+          "type": "graph",
+          "state": {}
         }
       }
     ],
@@ -69,7 +65,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Trick.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",

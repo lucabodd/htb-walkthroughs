@@ -223,7 +223,7 @@ Requests/sec.: 196.6385
 Hence, we can include any form of file.  
 
 ## User
-Once we have discovered the LFI, we exfiltrate `/etc/passwd` and see system users, once we have system users we can drop an email using the open smtp service, containing a payload, write the payload in a public www directory and then execute the payload to obtain a reverse shell.  
+Once we have discovered the LFI, we exfiltrate `/etc/passwd` and see system users, once we have system users we can drop an email using the open smtp service, containing a payload, write the payload in a public www directory and then execute the payload to obtain a reverse shell, similarly to what we did in [Beep](Beep.md).  
 ```
 [root@kali Trick ]$ telnet $TARGET 25
 Trying 10.10.11.166...
