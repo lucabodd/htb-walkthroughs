@@ -40,7 +40,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "Foren",
+                "query": "tag:#Late",
                 "matchingCase": true,
                 "explainSearch": true,
                 "collapseAll": false,
@@ -49,7 +49,8 @@
               }
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -87,12 +88,12 @@
     "width": 300,
     "collapsed": true
   },
-  "active": "f1443f03e29af2b7",
+  "active": "87ff7e1aca8c0757",
   "lastOpenFiles": [
-    "Frolic.md",
-    "Late.md",
-    "Doctor.md",
     "Template.md",
+    "Late.md",
+    "Frolic.md",
+    "Doctor.md",
     "Trick.md",
     "Teacher.md",
     "Academy.md",
