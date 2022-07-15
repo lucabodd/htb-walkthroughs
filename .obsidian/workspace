@@ -7,8 +7,12 @@
         "id": "f1443f03e29af2b7",
         "type": "leaf",
         "state": {
-          "type": "graph",
-          "state": {}
+          "type": "markdown",
+          "state": {
+            "file": "Late.md",
+            "mode": "source",
+            "source": false
+          }
         }
       }
     ],
@@ -36,9 +40,9 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
-                "matchingCase": false,
-                "explainSearch": false,
+                "query": "Foren",
+                "matchingCase": true,
+                "explainSearch": true,
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical"
@@ -65,6 +69,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "Late.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -84,15 +89,15 @@
   },
   "active": "f1443f03e29af2b7",
   "lastOpenFiles": [
-    "Trick.md",
+    "Frolic.md",
+    "Late.md",
+    "Doctor.md",
     "Template.md",
+    "Trick.md",
     "Teacher.md",
     "Academy.md",
     "Previse.md",
     "Bank.md",
-    "Bank.htb.md",
-    "Explore.md",
-    "Armageddon.md",
-    "BountyHunter.md"
+    "Bank.htb.md"
   ]
 }
