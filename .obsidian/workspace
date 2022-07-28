@@ -9,7 +9,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Undetected.md",
+            "file": "Backend.md",
             "mode": "source",
             "source": false
           }
@@ -53,7 +53,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 210
+    "width": 210,
+    "collapsed": true
   },
   "right": {
     "id": "60c20b51aa0c3961",
@@ -69,7 +70,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Undetected.md",
+                "file": "Backend.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -90,6 +91,7 @@
   "active": "f1443f03e29af2b7",
   "lastOpenFiles": [
     "Template.md",
+    "Undetected.md",
     "Late.md",
     "Frolic.md",
     "Doctor.md",
@@ -97,7 +99,6 @@
     "Teacher.md",
     "Academy.md",
     "Previse.md",
-    "Bank.md",
-    "Bank.htb.md"
+    "Bank.md"
   ]
 }
