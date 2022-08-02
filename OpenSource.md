@@ -251,7 +251,7 @@ connect to [10.10.14.9] from (UNKNOWN) [10.10.11.164] 38016
 /app #       
 ```
 
-### Method 1 - Arbitrary File Upload, Malicious Route Creation
+### Method 2 - Arbitrary File Upload, Malicious Route Creation
 When we overwrite the `__init__.py` file, the application stops working since our shell is interrupting the load of libraries.  
 Instead of overwriting, we can overwrite `/app/app/views.py` and add an additional route `/exec` that can allow us to execute code:  
 ```python
