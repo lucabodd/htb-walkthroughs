@@ -187,7 +187,7 @@ Now that we have more information on the application, since this is a flask appl
 Poking around on google we can come across [this source](https://ajinabraham.com/blog/exploiting-insecure-file-extraction-in-python-for-code-execution) that explains how to get an RCE with arbitrary file upload by overwriting the `__init__.py` file.  
 
 ## Foothold
-### Method 1 - Arbitrary File Upload, __init__.py Overwrite
+### Method 1 - Arbitrary File Upload, `__init__.py` Overwrite
 Once we have a foothold path, we can create a python reverse shell payload and forge the `filename` field in order to leverage a path traversal file upload and get an RCE:  
 ```http
 POST /upcloud HTTP/1.1
