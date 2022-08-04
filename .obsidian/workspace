@@ -9,7 +9,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "OpenSource.md",
+            "file": "RedPanda.md",
             "mode": "source",
             "source": false
           }
@@ -70,7 +70,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "OpenSource.md",
+                "file": "RedPanda.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -90,9 +90,9 @@
   },
   "active": "f1443f03e29af2b7",
   "lastOpenFiles": [
-    "Antique.md",
-    "OpenSource.md",
     "Template.md",
+    "OpenSource.md",
+    "Antique.md",
     "Backend.md",
     "Undetected.md",
     "Late.md",
